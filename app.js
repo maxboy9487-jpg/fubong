@@ -2295,15 +2295,16 @@ function getPortfolioTabContent() {
 
             state.portfolio.forEach(pos => {
                 const stock = state.marketData.find(s => s.symbol === pos.symbol);
-                let currentPrice = stock ? stock.price : pos.avgPrice;
                 let isHKPos = stock && stock.isHK;
                 let rate = isHKPos ? CONFIG.HKD_RATE : 1;
+                let currentPrice = stock ? stock.price : (pos.avgPrice / rate);
 
-                let costLocal = pos.avgPrice * pos.shares;
+                let localAvgPrice = pos.avgPrice / rate;
+                let costLocal = localAvgPrice * pos.shares;
                 let currentValLocal = currentPrice * pos.shares;
                 let pnlLocal = currentValLocal - costLocal;
 
-                let costTwd = costLocal * rate;
+                let costTwd = pos.avgPrice * pos.shares;
                 let currentValTwd = currentValLocal * rate;
                 let pnlTwd = currentValTwd - costTwd;
 
@@ -2389,11 +2390,11 @@ function getPortfolioTabContent() {
 
                 <!-- List Header -->
                 <div style="display:flex; align-items:center; color: #666; font-size: 0.95rem; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px; text-align: center;">
-                    <div style="width: 32%; text-align:left; flex-shrink: 0;">商品</div>
-                    <div style="width: 17%; text-align:center; flex-shrink: 0;">今餘</div>
-                    <div style="width: 17%; text-align:center; flex-shrink: 0;">可賣</div>
-                    <div style="width: 17%; text-align:right; flex-shrink: 0;">損益</div>
-                    <div style="width: 17%; text-align:right; flex-shrink: 0; padding-right: 4px;">損益率</div>
+                    <div style="width: 26%; text-align:left; flex-shrink: 0;">商品</div>
+                    <div style="width: 15%; text-align:center; flex-shrink: 0;">今餘</div>
+                    <div style="width: 15%; text-align:center; flex-shrink: 0;">可賣</div>
+                    <div style="width: 25%; text-align:right; flex-shrink: 0;">損益</div>
+                    <div style="width: 19%; text-align:right; flex-shrink: 0; padding-right: 4px;">損益率</div>
                 </div>
 
                 <div id="unrealized-list-container">
@@ -2404,20 +2405,22 @@ function getPortfolioTabContent() {
             } else {
                 state.portfolio.forEach(pos => {
                     const stock = state.marketData.find(s => s.symbol === pos.symbol);
-                    let currentPrice = stock ? stock.price : pos.avgPrice;
                     let isHKPos = stock && stock.isHK;
+                    let rate = isHKPos ? CONFIG.HKD_RATE : 1;
+                    let currentPrice = stock ? stock.price : (pos.avgPrice / rate);
                     
-                    let costLocal = pos.avgPrice * pos.shares;
+                    let localAvgPrice = pos.avgPrice / rate;
+                    let costLocal = localAvgPrice * pos.shares;
                     let currentValLocal = currentPrice * pos.shares;
                     let pnlLocal = currentValLocal - costLocal;
                     let pnlPct = costLocal > 0 ? (pnlLocal / costLocal) * 100 : 0;
                     let pnlColor = pnlLocal >= 0 ? '#e53935' : '#1eb274';
 
                     contentHtml += `
-                        <div style="display:flex; align-items:center; border-bottom: 1px solid #eee; padding: 12px 0; font-size: 1.05rem;">
+                        <div style="display:flex; align-items:center; border-bottom: 1px solid #eee; padding: 12px 0; font-size: 1rem;">
                             <!-- Stock Info -->
-                            <div style="width: 32%; text-align:left; flex-shrink: 0; display:flex; flex-direction:column; gap: 4px; min-width: 0;">
-                                <span style="font-weight: bold; color: #222; font-size: 1.05rem; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <div style="width: 26%; text-align:left; flex-shrink: 0; display:flex; flex-direction:column; gap: 4px; min-width: 0;">
+                                <span style="font-weight: bold; color: #222; font-size: 1rem; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                     ${pos.name}
                                 </span>
                                 <div style="display:flex; align-items:center; white-space: nowrap;">
@@ -2426,19 +2429,19 @@ function getPortfolioTabContent() {
                                 </div>
                             </div>
                             <!-- Shares (今餘) -->
-                            <div style="width: 17%; text-align:center; flex-shrink: 0; font-family:var(--font-mono); color: #222; white-space: nowrap;">
+                            <div style="width: 15%; text-align:center; flex-shrink: 0; font-family:var(--font-mono); color: #222; white-space: nowrap;">
                                 ${formatNumber(pos.shares, 0)}
                             </div>
                             <!-- Available (可賣) -->
-                            <div style="width: 17%; text-align:center; flex-shrink: 0; font-family:var(--font-mono); color: #222; white-space: nowrap;">
+                            <div style="width: 15%; text-align:center; flex-shrink: 0; font-family:var(--font-mono); color: #222; white-space: nowrap;">
                                 ${formatNumber(pos.shares, 0)}
                             </div>
                             <!-- PnL (損益) -->
-                            <div style="width: 17%; text-align:right; flex-shrink: 0; font-family:var(--font-mono); font-weight: bold; color: ${pnlColor}; white-space: nowrap;">
+                            <div style="width: 25%; text-align:right; flex-shrink: 0; font-family:var(--font-mono); font-weight: bold; color: ${pnlColor}; white-space: nowrap;">
                                 ${pnlLocal >= 0 ? '+' : ''}${formatNumber(pnlLocal)}
                             </div>
                             <!-- PnL % (損益率) -->
-                            <div style="width: 17%; text-align:right; flex-shrink: 0; padding-right: 4px; font-family:var(--font-mono); font-weight: bold; color: ${pnlColor}; white-space: nowrap;">
+                            <div style="width: 19%; text-align:right; flex-shrink: 0; padding-right: 4px; font-family:var(--font-mono); font-weight: bold; color: ${pnlColor}; white-space: nowrap;">
                                 ${pnlLocal >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%
                             </div>
                         </div>
