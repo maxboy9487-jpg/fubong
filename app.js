@@ -13,10 +13,10 @@ window.selectionSubPage = null;
 window.selectionSubFilter = 'default';
 window.expandedStocks = new Set();
 
-window.togglePortfolioRow = function(symbol) {
+window.togglePortfolioRow = function (symbol) {
     const detailEl = document.getElementById(`inv-detail-${symbol}`);
     if (!detailEl) return;
-    
+
     const isCurrentlyVisible = detailEl.style.display !== 'none';
     if (isCurrentlyVisible) {
         detailEl.style.display = 'none';
@@ -64,21 +64,21 @@ const state = {
     currentBranch: `(台)台南 3815467`
 };
 
-window.switchAccount = function(id) {
+window.switchAccount = function (id) {
     if (window.currentAccountId) saveState();
     window.currentAccountId = id;
     localStorage.setItem('stockCurrentAccount', id);
-    
+
     const account = ACCOUNTS.find(a => a.id === id);
     if (account) state.currentBranch = `(台)${account.branch} ${account.id}`;
-    
+
     resetStateInMemory();
     loadState();
-    
+
     // Remove overlay if it exists
     const overlay = document.querySelector('.account-selection-overlay');
     if (overlay) overlay.remove();
-    
+
     renderPage('home');
     showToast(`已切換至帳戶: ${state.currentBranch}`);
 };
@@ -94,13 +94,13 @@ function resetStateInMemory() {
     state.todayTrades = new Set();
 }
 
-window.renderAccountSelectionOverlay = function() {
+window.renderAccountSelectionOverlay = function () {
     const existing = document.querySelector('.account-selection-overlay');
     if (existing) return;
 
     const overlay = document.createElement('div');
     overlay.className = 'account-selection-overlay';
-    
+
     let accountsHtml = ACCOUNTS.map(acc => `
         <div class="account-card ${window.currentAccountId === acc.id ? 'active' : ''}" onclick="window.switchAccount('${acc.id}')">
             <div>
@@ -124,7 +124,7 @@ window.renderAccountSelectionOverlay = function() {
         </div>
     `;
     document.body.appendChild(overlay);
-    
+
     // Allow clicking outside to close
     overlay.onclick = (e) => {
         if (e.target === overlay) {
@@ -133,24 +133,24 @@ window.renderAccountSelectionOverlay = function() {
     };
 };
 
-window.promptAddAccount = function() {
+window.promptAddAccount = function () {
     const branch = prompt('請輸入分公司地區 (例如: 台中)');
     if (!branch) return;
     const id = prompt('請輸入帳號數字 (例如: 1234567)');
     if (!id) return;
-    
+
     const newAcc = { branch, id };
     ACCOUNTS.push(newAcc);
-    
+
     let custom = JSON.parse(localStorage.getItem('stockCustomAccounts') || '[]');
     custom.push(newAcc);
     localStorage.setItem('stockCustomAccounts', JSON.stringify(custom));
-    
+
     // Refresh the overlay
     const overlay = document.querySelector('.account-selection-overlay');
     if (overlay) document.body.removeChild(overlay);
     window.renderAccountSelectionOverlay();
-    
+
     showToast(`✅ 已新增帳戶: ${branch} ${id}`, 'success');
 };
 
@@ -767,7 +767,7 @@ window.goToTrade = (symbol, side = 'buy') => {
 function renderPage(page, options = {}) {
     if (page !== 'stockDetail' && page !== 'trade') state.previousPage = state.currentPage;
     state.currentPage = page;
-    
+
     if (!options.keepScroll) {
         window.mainContent.scrollTop = 0;
     }
@@ -1814,10 +1814,10 @@ function exportHistoryCSV() {
 }
 window.exportHistoryCSV = exportHistoryCSV;
 
-window.switchPortfolioTab = function(tab) {
+window.switchPortfolioTab = function (tab) {
     if (!['trade', 'orders', 'history', 'temp', 'other'].includes(tab)) tab = 'trade';
     window.portfolioTab = tab;
-    
+
     ['trade', 'orders', 'history', 'temp', 'other'].forEach(t => {
         const el = document.getElementById(`portfolio-tab-${t}`);
         const line = document.getElementById(`portfolio-tab-line-${t}`);
@@ -1833,10 +1833,10 @@ window.switchPortfolioTab = function(tab) {
             }
         }
     });
-    
+
     const listEl = document.getElementById('portfolio-list');
     if (!listEl) return;
-    
+
     if (tab === 'trade') {
         listEl.replaceChildren(buildTradePage());
     } else {
@@ -2147,7 +2147,7 @@ function getPortfolioTabContent() {
         return topFilter + managerHtml;
     } else if (window.portfolioTab === 'orders') {
         if (!window.ordersSubTab) window.ordersSubTab = 'orders';
-        
+
         let ordersHtml = `
             <div style="background-color: #ffffff; min-height: 100vh; color: #333; padding: 16px;">
                 <!-- Pill group -->
@@ -2180,7 +2180,7 @@ function getPortfolioTabContent() {
                 
                 <div id="orders-list-container">
         `;
-        
+
         if (window.ordersSubTab === 'orders') {
             if (state.orders.length === 0) {
                 ordersHtml += '<div style="text-align:center; padding: 2.5rem; color: #888; font-weight:bold;">無委託紀錄</div>';
@@ -2191,15 +2191,15 @@ function getPortfolioTabContent() {
                     if (o.status === 'pending') { statusTop = '委託'; statusBottom = '成功'; }
                     else if (o.status === 'pending-disposition') { statusTop = '分盤'; statusBottom = '委託'; }
                     else if (o.status === 'executed') { statusTop = '完全'; statusBottom = '成交'; }
-                    else { statusTop = '全部'; statusBottom = '取消'; }
+                    else { statusTop = '全部'; statusBottom = '刪單'; }
 
                     let sideColor = o.side === 'buy' ? '#e53935' : '#1e88e5';
                     let execShares = o.status === 'executed' ? o.shares : 0;
                     let execAvgPrice = o.execPrice ? o.execPrice : 0;
-                    
+
                     const stockO = state.marketData.find(s => s.symbol === o.symbol);
                     let isHKLine = stockO && stockO.isHK;
-                    
+
                     ordersHtml += `
                         <div style="display:flex; align-items:stretch; border-bottom: 1px solid #eee; padding: 12px 0;">
                             <div style="width: 44px; display:flex; justify-content:center; align-items:center; padding-right: 8px;">
@@ -2235,7 +2235,7 @@ function getPortfolioTabContent() {
                 state.history.slice().reverse().forEach(h => {
                     let tradePrice = h.price || h.sellPrice || h.buyAvgPrice || 0;
                     let sideColor = h.type === 'buy' ? '#e53935' : '#1e88e5';
-                    
+
                     const stockH = state.marketData.find(s => s.symbol === h.symbol);
                     let isHKLine = stockH && stockH.isHK;
 
@@ -2264,7 +2264,7 @@ function getPortfolioTabContent() {
                 });
             }
         }
-        
+
         ordersHtml += `
                 </div>
             </div>
@@ -2408,7 +2408,7 @@ function getPortfolioTabContent() {
                     let isHKPos = stock && stock.isHK;
                     let rate = isHKPos ? CONFIG.HKD_RATE : 1;
                     let currentPrice = stock ? stock.price : (pos.avgPrice / rate);
-                    
+
                     let localAvgPrice = pos.avgPrice / rate;
                     let costLocal = localAvgPrice * pos.shares;
                     let currentValLocal = currentPrice * pos.shares;
@@ -2661,13 +2661,13 @@ function getPortfolioTabContent() {
 function renderMorePage() {
     let ordersWithDocNo = state.orders.map(o => ({ id: o.id, symbol: o.symbol, name: o.name, docNo: o.docNo, type: 'order' }));
     let historyWithDocNo = state.history.map(h => ({ id: h.id, symbol: h.symbol, name: h.name, docNo: h.docNo, type: 'history' }));
-    
+
     let allEntries = [...ordersWithDocNo, ...historyWithDocNo];
 
     let listHtml = allEntries.map(entry => {
         let entryObj = entry.type === 'order' ? state.orders.find(o => o.id == entry.id) : state.history.find(h => h.id == entry.id);
         let currentTime = entryObj ? entryObj.time : '';
-        
+
         return `
             <div class="card" style="margin-bottom:12px; padding:16px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -2737,7 +2737,7 @@ function renderMorePage() {
     `;
 }
 
-window.moreChangeStockPrice = function() {
+window.moreChangeStockPrice = function () {
     const symbol = document.getElementById('more-change-stock-select').value;
     const priceVal = document.getElementById('more-change-stock-price').value;
     if (!priceVal) {
@@ -2749,7 +2749,7 @@ window.moreChangeStockPrice = function() {
         showToast('請輸入有效大於 0 的價格');
         return;
     }
-    
+
     // Find stock and update
     const stock = state.marketData.find(s => s.symbol === symbol);
     if (stock) {
@@ -2762,10 +2762,10 @@ window.moreChangeStockPrice = function() {
     }
 };
 
-window.saveBatchEdits = function() {
+window.saveBatchEdits = function () {
     const docInputs = document.querySelectorAll('.doc-no-input');
     const timeInputs = document.querySelectorAll('.time-input');
-    
+
     // Process DocNos
     docInputs.forEach(input => {
         const id = input.getAttribute('data-id');
@@ -2972,7 +2972,7 @@ function buildTradePage() {
                         <span style="white-space:nowrap;">今日: <strong class="text-up">${formatNumber(stock.high)}</strong> / <strong class="text-down">${formatNumber(stock.low)}</strong></span>
                         <div style="flex:1; height:5px; background:var(--border-color); border-radius:3px; position:relative;">
                             <div style="position:absolute;left:0;top:0;bottom:0;right:0;background:linear-gradient(to right,var(--color-down),#888,var(--color-up));border-radius:3px;"></div>
-                            <div style="position:absolute;top:-3px;bottom:-3px;width:7px;background:white;border-radius:3px;box-shadow:0 0 3px rgba(0,0,0,0.5);left:${Math.min(98,Math.max(2,((currentPrice-stock.low)/(stock.high-stock.low))*100)).toFixed(1)}%;transform:translateX(-50%);"></div>
+                            <div style="position:absolute;top:-3px;bottom:-3px;width:7px;background:white;border-radius:3px;box-shadow:0 0 3px rgba(0,0,0,0.5);left:${Math.min(98, Math.max(2, ((currentPrice - stock.low) / (stock.high - stock.low)) * 100)).toFixed(1)}%;transform:translateX(-50%);"></div>
                         </div>
                     </div>` : ''}
                 </div>
@@ -3088,10 +3088,10 @@ function buildTradePage() {
         container.querySelector('#trade-symbol').onchange = (e) => {
             tradeState.symbol = e.target.value;
             const newStock = state.marketData.find(s => s.symbol === tradeState.symbol);
-            if (newStock) { 
-                tradeState.limitPrice = newStock.price; 
-                tradeState.triggerPrice = newStock.price; 
-                tradeState.triggerOrderPrice = newStock.price; 
+            if (newStock) {
+                tradeState.limitPrice = newStock.price;
+                tradeState.triggerPrice = newStock.price;
+                tradeState.triggerOrderPrice = newStock.price;
                 tradeState.shares = newStock.lotSizeVal || 1000;
             } else {
                 tradeState.shares = 1000;
@@ -3104,10 +3104,10 @@ function buildTradePage() {
 
         const lotsIn = container.querySelector('#trade-lots');
         if (lotsIn) {
-            lotsIn.oninput = (e) => { 
+            lotsIn.oninput = (e) => {
                 const lots = parseInt(e.target.value) || 0;
-                tradeState.shares = lots * currentLotSize; 
-                renderForm(); 
+                tradeState.shares = lots * currentLotSize;
+                renderForm();
             };
         }
 
@@ -3468,12 +3468,12 @@ function updatePortfolioRowUI(stock) {
     const valEl = document.getElementById(`inv-val-${stock.symbol}`);
     const pnlEl = document.getElementById(`inv-pnl-${stock.symbol}`);
     const yieldEl = document.getElementById(`inv-yield-${stock.symbol}`);
-    
+
     // Bottom Summary Fields
     const sPnlEl = document.getElementById(`summary-pnl-${stock.symbol}`);
     const sPctEl = document.getElementById(`summary-pct-${stock.symbol}`);
     const sValEl = document.getElementById(`summary-val-${stock.symbol}`);
-    
+
     if (valEl) valEl.textContent = formatNumber(Math.round(localCurrentVal), 0);
     if (pnlEl) {
         pnlEl.textContent = `${getSign(localGrossPnl)}${formatNumber(Math.round(localGrossPnl), 0)}`;
