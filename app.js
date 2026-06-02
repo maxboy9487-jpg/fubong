@@ -1814,7 +1814,7 @@ function exportHistoryCSV() {
 }
 window.exportHistoryCSV = exportHistoryCSV;
 
-window.switchPortfolioTab = function (tab) {
+window.switchPortfolioTab = function (tab, skipToast) {
     if (!['trade', 'orders', 'history', 'temp', 'other'].includes(tab)) tab = 'trade';
     window.portfolioTab = tab;
 
@@ -1842,7 +1842,55 @@ window.switchPortfolioTab = function (tab) {
     } else {
         listEl.innerHTML = getPortfolioTabContent();
     }
+
+    if (!skipToast && typeof window.showPortfolioStatusToast === 'function') {
+        window.showPortfolioStatusToast();
+    }
 };
+
+window.toggleOrderExpand = function (id) {
+    window.expandedOrders = window.expandedOrders || {};
+    window.expandedOrders[id] = !window.expandedOrders[id];
+    window.switchPortfolioTab('orders', true);
+};
+window.toggleTradeExpand = function (id) {
+    window.expandedTrades = window.expandedTrades || {};
+    window.expandedTrades[id] = !window.expandedTrades[id];
+    window.switchPortfolioTab('orders', true);
+};
+
+window.showPortfolioStatusToast = function () {
+    const toast = document.getElementById('portfolio-status-toast');
+    if (!toast) return;
+
+    if (window.portfolioToastTimer1) clearTimeout(window.portfolioToastTimer1);
+    if (window.portfolioToastTimer2) clearTimeout(window.portfolioToastTimer2);
+    if (window.portfolioToastTimer3) clearTimeout(window.portfolioToastTimer3);
+
+    toast.textContent = "資料查詢中...";
+    toast.style.display = 'block';
+    toast.style.opacity = '1';
+
+    window.portfolioToastTimer1 = setTimeout(() => {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        const hh = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        const ss = String(now.getSeconds()).padStart(2, '0');
+        const timeStr = `${yyyy}/${mm}/${dd} ${hh}:${min}:${ss}更新`;
+        toast.textContent = timeStr;
+
+        window.portfolioToastTimer2 = setTimeout(() => {
+            toast.style.opacity = '0';
+            window.portfolioToastTimer3 = setTimeout(() => {
+                toast.style.display = 'none';
+            }, 300);
+        }, 1500);
+    }, 600);
+};
+
 
 function renderPortfolioPage() {
     if (!['trade', 'orders', 'history', 'temp', 'other'].includes(window.portfolioTab)) {
@@ -1877,6 +1925,9 @@ function renderPortfolioPage() {
           </div>
         </div>
         <div id="portfolio-list"></div>
+        <div id="portfolio-status-toast" style="display: none; position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background-color: #3b3c43; color: white; padding: 10px 24px; border-radius: 12px; font-size: 0.95rem; font-weight: 500; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: opacity 0.3s; opacity: 0; text-align: center; white-space: nowrap; pointer-events: none;">
+            資料查詢中...
+        </div>
     `;
     return topHtml;
 }
@@ -2182,6 +2233,7 @@ function getPortfolioTabContent() {
         `;
 
         if (window.ordersSubTab === 'orders') {
+            if (!window.expandedOrders) window.expandedOrders = {};
             if (state.orders.length === 0) {
                 ordersHtml += '<div style="text-align:center; padding: 2.5rem; color: #888; font-weight:bold;">無委託紀錄</div>';
             } else {
@@ -2191,7 +2243,7 @@ function getPortfolioTabContent() {
                     if (o.status === 'pending') { statusTop = '委託'; statusBottom = '成功'; }
                     else if (o.status === 'pending-disposition') { statusTop = '分盤'; statusBottom = '委託'; }
                     else if (o.status === 'executed') { statusTop = '完全'; statusBottom = '成交'; }
-                    else { statusTop = '全部'; statusBottom = '刪單'; }
+                    else { statusTop = '刪單'; statusBottom = '成功'; }
 
                     let sideColor = o.side === 'buy' ? '#e53935' : '#1e88e5';
                     let execShares = o.status === 'executed' ? o.shares : 0;
@@ -2199,38 +2251,80 @@ function getPortfolioTabContent() {
 
                     const stockO = state.marketData.find(s => s.symbol === o.symbol);
                     let isHKLine = stockO && stockO.isHK;
+                    let isExpanded = !!window.expandedOrders[o.id];
+                    let chevronClass = isExpanded ? 'fa-chevron-up' : 'fa-chevron-down';
 
                     ordersHtml += `
-                        <div style="display:flex; align-items:stretch; border-bottom: 1px solid #eee; padding: 12px 0;">
-                            <div style="width: 44px; display:flex; justify-content:center; align-items:center; flex-shrink:0;">
-                                ${isCancellable ? `<div style="background-color: #1a92bc; color: white; width: 36px; padding: 10px 0; border-radius: 4px; font-weight: bold; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer;" onclick="cancelOrder(${o.id})"><div>刪</div><div>單</div></div>` : ''}
-                            </div>
-                            <div style="flex:1.5; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:left; padding-left:8px;">
-                                <div style="font-weight:bold; font-size:1.1rem; color:#222;">${o.name}</div>
-                                <div style="display:flex; align-items:center; gap:4px;">
-                                    ${isHKLine ? `<span style="background-color:#7e57c2; color:white; padding:2px 4px; border-radius:4px; font-size:0.75rem; font-weight:bold;">HK</span>` : `<span style="background-color:#fbc02d; color:white; padding:2px 4px; border-radius:4px; font-size:0.75rem; font-weight:bold;">TW</span>`}
-                                    <span style="color:${sideColor}; font-size:0.9rem; font-weight:bold;">${o.side === 'buy' ? '買進' : '賣出'}</span>
-                                    <span style="color:#888; font-size:0.9rem; font-weight:500;">限價</span>
+                        <div style="display:flex; flex-direction:column; border-bottom: 1px solid #eee;">
+                            <div style="display:flex; align-items:stretch; padding: 12px 0; cursor:pointer;" onclick="window.toggleOrderExpand(${o.id})">
+                                <div style="width: 44px; display:flex; justify-content:center; align-items:center; flex-shrink:0;">
+                                    ${isCancellable ? `<div style="background-color: #1a92bc; color: white; width: 36px; padding: 10px 0; border-radius: 4px; font-weight: bold; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer;" onclick="event.stopPropagation(); cancelOrder(${o.id})"><div>刪</div><div>單</div></div>` : ''}
+                                </div>
+                                <div style="flex:1.5; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:left; padding-left:8px;">
+                                    <div style="font-weight:bold; font-size:1.1rem; color:#222;">${o.name}</div>
+                                    <div style="display:flex; align-items:center; gap:4px;">
+                                        ${isHKLine ? `<span style="background-color:#7e57c2; color:white; padding:2px 4px; border-radius:4px; font-size:0.75rem; font-weight:bold;">HK</span>` : `<span style="background-color:#fbc02d; color:white; padding:2px 4px; border-radius:4px; font-size:0.75rem; font-weight:bold;">TW</span>`}
+                                        <span style="color:${sideColor}; font-size:0.9rem; font-weight:bold;">${o.side === 'buy' ? '買進' : '賣出'}</span>
+                                        <span style="color:${sideColor}; font-size:0.9rem; font-weight:bold; margin-left:2px;">限價</span>
+                                    </div>
+                                </div>
+                                <div style="flex:1; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:center;">
+                                    <div style="font-size:1.05rem; color:#222; font-family:var(--font-mono);">${formatNumber(o.shares, 0)}股</div>
+                                    <div style="font-size:1.05rem; color:#222; font-family:var(--font-mono);">${o.status === 'executed' ? formatNumber(execShares, 0) + '股' : '-'}</div>
+                                </div>
+                                <div style="flex:1; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:center;">
+                                    <div style="font-size:1.05rem; color:#222; font-family:var(--font-mono);">${formatNumber(o.price, isHKLine ? 2 : 0)}</div>
+                                    <div style="font-size:1.05rem; color:#222; font-family:var(--font-mono);">${o.status === 'executed' ? formatNumber(execAvgPrice, isHKLine ? 2 : 0) : '-'}</div>
+                                </div>
+                                <div style="flex:0.8; display:flex; align-items:center; justify-content:flex-end; gap:8px; padding-right:8px;">
+                                    <div style="display:flex; flex-direction:column; align-items:flex-end; justify-content:center;">
+                                        <div style="font-size:1rem; color:#222; font-weight:500; line-height:1.2;">${statusTop}</div>
+                                        <div style="font-size:1rem; color:#222; font-weight:500; line-height:1.2;">${statusBottom}</div>
+                                    </div>
+                                    <div style="display:flex; align-items:center; justify-content:center; width:12px; flex-shrink:0;">
+                                        <i class="fa-solid ${chevronClass}" style="font-size:0.75rem; color:#222;"></i>
+                                    </div>
                                 </div>
                             </div>
-                            <div style="flex:1; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:center;">
-                                <div style="font-size:1.05rem; color:#222; font-family:var(--font-mono);">${formatNumber(o.shares, 0)}股</div>
-                                <div style="font-size:1.05rem; color:#222; font-family:var(--font-mono);">${o.status === 'executed' ? formatNumber(execShares, 0) + '股' : '-'}</div>
+                            ${isExpanded ? `
+                            <div style="background-color: #ebedf0; border-radius: 8px; padding: 12px 16px; margin: 0px 8px 12px 8px; font-size: 0.9rem; color: #333; display: flex; flex-direction: column; gap: 8px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="color:#666;">觸價價格</span>
+                                    <span style="font-family:var(--font-mono); font-weight:500;">-</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="color:#666;">委託時間</span>
+                                    <span style="font-family:var(--font-mono); font-weight:500;">${o.time || '-'}</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="color:#666;">取消</span>
+                                    <span style="font-family:var(--font-mono); font-weight:500;">-</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="color:#666;">狀態</span>
+                                    <span style="font-weight:500;">${statusTop}${statusBottom}</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="color:#666;">有效期限</span>
+                                    <span style="font-family:var(--font-mono); font-weight:500;">-</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="color:#666;">委託書號</span>
+                                    <span style="font-family:var(--font-mono); font-weight:500;">${o.docNo || '-'}</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="color:#666;">原因</span>
+                                    <span style="font-weight:500;">-</span>
+                                </div>
                             </div>
-                            <div style="flex:1; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:center;">
-                                <div style="font-size:1.05rem; color:#222; font-family:var(--font-mono);">${formatNumber(o.price)}</div>
-                                <div style="font-size:1.05rem; color:#222; font-family:var(--font-mono);">${o.status === 'executed' ? formatNumber(execAvgPrice) : '-'}</div>
-                            </div>
-                            <div style="flex:0.8; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:right; padding-right:8px;">
-                                <div style="font-size:1rem; color:#222; font-weight:500;">${statusTop}</div>
-                                <div style="font-size:1rem; color:#222; display:flex; align-items:center; justify-content:flex-end; gap:4px;">${statusBottom} <i class="fa-solid fa-chevron-down" style="font-size:0.7rem;"></i></div>
-                            </div>
+                            ` : ''}
                         </div>
                     `;
                 });
             }
         } else {
             // Trades Tab
+            if (!window.expandedTrades) window.expandedTrades = {};
             if (state.history.length === 0) {
                 ordersHtml += '<div style="text-align:center; padding: 2.5rem; color: #888; font-weight:bold;">尚無成交紀錄</div>';
             } else {
@@ -2240,29 +2334,70 @@ function getPortfolioTabContent() {
 
                     const stockH = state.marketData.find(s => s.symbol === h.symbol);
                     let isHKLine = stockH && stockH.isHK;
+                    let isExpanded = !!window.expandedTrades[h.id];
+                    let chevronClass = isExpanded ? 'fa-chevron-up' : 'fa-chevron-down';
 
                     ordersHtml += `
-                        <div style="display:flex; align-items:stretch; border-bottom: 1px solid #eee; padding: 12px 0;">
-                            <div style="flex:1.5; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:left; padding-left:8px;">
-                                <div style="font-weight:bold; font-size:1.1rem; color:#222;">${h.name}</div>
-                                <div style="display:flex; align-items:center; gap:4px;">
-                                    ${isHKLine ? `<span style="background-color:#7e57c2; color:white; padding:2px 4px; border-radius:4px; font-size:0.75rem; font-weight:bold;">HK</span>` : `<span style="background-color:#fbc02d; color:white; padding:2px 4px; border-radius:4px; font-size:0.75rem; font-weight:bold;">TW</span>`}
-                                    <span style="color:${sideColor}; font-size:0.9rem; font-weight:bold;">${h.type === 'buy' ? '買進' : '賣出'}</span>
-                                    <span style="color:#888; font-size:0.9rem; font-weight:500;">限價</span>
+                        <div style="display:flex; flex-direction:column; border-bottom: 1px solid #eee;">
+                            <div style="display:flex; align-items:stretch; padding: 12px 0; cursor:pointer;" onclick="window.toggleTradeExpand(${h.id})">
+                                <div style="flex:1.5; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:left; padding-left:8px;">
+                                    <div style="font-weight:bold; font-size:1.1rem; color:#222;">${h.name}</div>
+                                    <div style="display:flex; align-items:center; gap:4px;">
+                                        ${isHKLine ? `<span style="background-color:#7e57c2; color:white; padding:2px 4px; border-radius:4px; font-size:0.75rem; font-weight:bold;">HK</span>` : `<span style="background-color:#fbc02d; color:white; padding:2px 4px; border-radius:4px; font-size:0.75rem; font-weight:bold;">TW</span>`}
+                                        <span style="color:${sideColor}; font-size:0.9rem; font-weight:bold;">${h.type === 'buy' ? '買進' : '賣出'}</span>
+                                        <span style="color:${sideColor}; font-size:0.9rem; font-weight:bold; margin-left:2px;">限價</span>
+                                    </div>
+                                </div>
+                                <div style="flex:1; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:center;">
+                                    <div style="font-size:1.05rem; color:#222; font-family:var(--font-mono);">${formatNumber(h.shares, 0)}股</div>
+                                    <div style="font-size:1.05rem; color:#222; font-family:var(--font-mono);">${formatNumber(h.shares, 0)}股</div>
+                                </div>
+                                <div style="flex:1; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:center;">
+                                    <div style="font-size:1.05rem; color:#222; font-family:var(--font-mono);">${formatNumber(tradePrice, isHKLine ? 2 : 0)}</div>
+                                    <div style="font-size:1.05rem; color:#222; font-family:var(--font-mono);">${formatNumber(tradePrice, isHKLine ? 2 : 0)}</div>
+                                </div>
+                                <div style="flex:0.8; display:flex; align-items:center; justify-content:flex-end; gap:8px; padding-right:8px;">
+                                    <div style="display:flex; flex-direction:column; align-items:flex-end; justify-content:center;">
+                                        <div style="font-size:1rem; color:#222; font-weight:500; line-height:1.2;">完全</div>
+                                        <div style="font-size:1rem; color:#222; font-weight:500; line-height:1.2;">成交</div>
+                                    </div>
+                                    <div style="display:flex; align-items:center; justify-content:center; width:12px; flex-shrink:0;">
+                                        <i class="fa-solid ${chevronClass}" style="font-size:0.75rem; color:#222;"></i>
+                                    </div>
                                 </div>
                             </div>
-                            <div style="flex:1; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:center;">
-                                <div style="font-size:1.05rem; color:#222; font-family:var(--font-mono);">${formatNumber(h.shares, 0)}股</div>
-                                <div style="font-size:1.05rem; color:#222; font-family:var(--font-mono);">${formatNumber(h.shares, 0)}股</div>
+                            ${isExpanded ? `
+                            <div style="background-color: #ebedf0; border-radius: 8px; padding: 12px 16px; margin: 0px 8px 12px 8px; font-size: 0.9rem; color: #333; display: flex; flex-direction: column; gap: 8px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="color:#666;">觸價價格</span>
+                                    <span style="font-family:var(--font-mono); font-weight:500;">-</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="color:#666;">委託時間</span>
+                                    <span style="font-family:var(--font-mono); font-weight:500;">${h.time || '-'}</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="color:#666;">取消</span>
+                                    <span style="font-family:var(--font-mono); font-weight:500;">-</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="color:#666;">狀態</span>
+                                    <span style="font-weight:500;">完全成交</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="color:#666;">有效期限</span>
+                                    <span style="font-family:var(--font-mono); font-weight:500;">-</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="color:#666;">委託書號</span>
+                                    <span style="font-family:var(--font-mono); font-weight:500;">${h.docNo || '-'}</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="color:#666;">原因</span>
+                                    <span style="font-weight:500;">-</span>
+                                </div>
                             </div>
-                            <div style="flex:1; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:center;">
-                                <div style="font-size:1.05rem; color:#222; font-family:var(--font-mono);">${formatNumber(tradePrice)}</div>
-                                <div style="font-size:1.05rem; color:#222; font-family:var(--font-mono);">${formatNumber(tradePrice)}</div>
-                            </div>
-                            <div style="flex:0.8; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:right; padding-right:8px;">
-                                <div style="font-size:1rem; color:#222; font-weight:500;">完全</div>
-                                <div style="font-size:1rem; color:#222; display:flex; align-items:center; justify-content:flex-end; gap:4px;">成交 <i class="fa-solid fa-chevron-down" style="font-size:0.7rem;"></i></div>
-                            </div>
+                            ` : ''}
                         </div>
                     `;
                 });
