@@ -402,8 +402,6 @@ body::after {
 }
 
 /* Button Disable Override */
-
-/* Button Disable Override */
 .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
 
 /* Watchlist Star */
@@ -886,7 +884,7 @@ body::after {
     background-color: #ffffff !important;
     color: #333333 !important;
     min-height: 100%;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--font-family);
 }
 
 .portfolio-page .sub-brokerage-header {
@@ -1062,7 +1060,7 @@ body::after {
 }
 
 .portfolio-page .text-down, .portfolio-page .custom-table-row div.text-down {
-    color: #139a8c !important;
+    color: #32A29E !important;
 }
 
 .portfolio-page .text-up, .portfolio-page .custom-table-row div.text-up {
@@ -1326,6 +1324,3 @@ body::after {
     background-color: #139a8c !important;
     color: #ffffff !important;
 }
-
-
-
