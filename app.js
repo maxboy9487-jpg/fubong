@@ -2520,7 +2520,7 @@ function getPortfolioTabContent() {
                 </div>
  
                 <!-- List Header -->
-                <div style="display:flex; align-items:center; color: #666; font-size: 1.1rem; font-weight: normal; padding-bottom: 6px; margin-bottom: 6px; text-align: center;">
+                <div style="display:flex; align-items:center; color: #666; font-size: 0.88rem; font-weight: normal; padding-bottom: 6px; margin-bottom: 6px; text-align: center;">
                     <div style="width: 26%; text-align:left; flex-shrink: 0; padding-left: 8px;">商品</div>
                     <div style="width: 14%; text-align:center; flex-shrink: 0;">今餘</div>
                     <div style="width: 18%; text-align:center; flex-shrink: 0;">可賣</div>
@@ -2552,28 +2552,28 @@ function getPortfolioTabContent() {
                         <div style="display:flex; align-items:center; border-bottom: 1px solid #eee; padding: 9px 0; font-size: 0.9rem;">
                             <!-- Stock Info -->
                             <div style="width: 26%; text-align:left; flex-shrink: 0; display:flex; flex-direction:column; gap: 4px; min-width: 0; padding-left: 8px;">
-                                <span style="font-weight: bold; color: #000000; font-size: 1.15rem; line-height: 1.1; display: inline-block; max-width: 4em; word-break: break-all; white-space: normal;">
+                                <span style="font-weight: bold; color: #000000; font-size: 1.02rem; line-height: 1.1; display: inline-block; max-width: 4em; word-break: break-all; white-space: normal;">
                                     ${pos.name}
                                 </span>
                                 <div style="display:flex; align-items:center; white-space: nowrap; margin-top: 4px;">
-                                    ${isHKPos ? `<span style="background-color: #5c3ec2; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.82rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">HK</span>` : `<span style="background-color: #e67e22; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.82rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">TW</span>`}
-                                    <span style="color: #4b5563; font-size: 1.02rem; font-weight: 500; font-family:var(--font-mono);">${displaySymbol}</span>
+                                    ${isHKPos ? `<span style="background-color: #5c3ec2; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">HK</span>` : `<span style="background-color: #e67e22; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">TW</span>`}
+                                    <span style="color: #4b5563; font-size: 0.85rem; font-weight: 500; font-family:var(--font-mono);">${displaySymbol}</span>
                                 </div>
                             </div>
                             <!-- Shares (今餘) -->
-                            <div style="width: 14%; text-align:center; flex-shrink: 0; font-family:var(--font-mono); color: #222; white-space: nowrap; font-size: 1.15rem; font-weight: normal;">
+                            <div style="width: 14%; text-align:center; flex-shrink: 0; font-family:var(--font-mono); color: #222; white-space: nowrap; font-size: 0.9rem; font-weight: normal;">
                                 ${formatNumber(pos.shares, 0)}
                             </div>
                             <!-- Available (可賣) -->
-                            <div style="width: 18%; text-align:center; flex-shrink: 0; font-family:var(--font-mono); color: #222; white-space: nowrap; font-size: 1.15rem; font-weight: normal;">
+                            <div style="width: 18%; text-align:center; flex-shrink: 0; font-family:var(--font-mono); color: #222; white-space: nowrap; font-size: 0.9rem; font-weight: normal;">
                                 ${formatNumber(pos.shares, 0)}
                             </div>
                             <!-- PnL (損益) -->
-                            <div style="width: 23%; text-align:right; flex-shrink: 0; font-family:var(--font-mono); font-weight: normal; color: ${pnlColor}; white-space: nowrap; font-size: 1.15rem;">
+                            <div style="width: 23%; text-align:right; flex-shrink: 0; font-family:var(--font-mono); font-weight: normal; color: ${pnlColor}; white-space: nowrap; font-size: 0.9rem;">
                                 ${pnlLocal >= 0 ? '+' : ''}${formatNumber(pnlLocal)}
                             </div>
                             <!-- PnL % (損益率) -->
-                            <div style="width: 19%; text-align:right; flex-shrink: 0; padding-right: 4px; font-family:var(--font-mono); font-weight: normal; color: ${pnlColor}; white-space: nowrap; font-size: 1.15rem;">
+                            <div style="width: 19%; text-align:right; flex-shrink: 0; padding-right: 4px; font-family:var(--font-mono); font-weight: normal; color: ${pnlColor}; white-space: nowrap; font-size: 0.9rem;">
                                 ${pnlLocal >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%
                             </div>
                         </div>
@@ -2627,7 +2627,7 @@ function getPortfolioTabContent() {
                 </div>
 
                 <!-- List Header -->
-                <div style="display:flex; align-items:center; color: #666; font-size: 1.1rem; font-weight: normal; padding-bottom: 6px; margin-bottom: 6px; text-align: center;">
+                <div style="display:flex; align-items:center; color: #666; font-size: 0.88rem; font-weight: normal; padding-bottom: 6px; margin-bottom: 6px; text-align: center;">
                     <div style="width: 26%; text-align:left; flex-shrink: 0; padding-left: 8px;">商品</div>
                     <div style="width: 38%; text-align:center; flex-shrink: 0;">賣出數量/價格</div>
                     <div style="width: 36%; text-align:right; flex-shrink: 0; padding-right: 4px;">損益/損益率</div>
@@ -2669,21 +2669,21 @@ function getPortfolioTabContent() {
                         <div style="display:flex; align-items:center; border-bottom: 1px solid #eee; padding: 9px 0;">
                             <!-- Column 1: 商品 -->
                             <div style="width: 26%; text-align:left; flex-shrink: 0; display:flex; flex-direction:column; gap: 4px; min-width: 0; padding-left: 8px;">
-                                <div style="font-weight:bold; color:#000000; font-size:1.15rem; line-height: 1.1; display: inline-block; max-width: 4em; word-break: break-all; white-space: normal;">${h.name}</div>
+                                <div style="font-weight:bold; color:#000000; font-size:1.02rem; line-height: 1.1; display: inline-block; max-width: 4em; word-break: break-all; white-space: normal;">${h.name}</div>
                                 <div style="display:flex; align-items:center; margin-top: 4px; white-space: nowrap;">
-                                    ${isHKLine ? `<span style="background-color: #5c3ec2; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.82rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">HK</span>` : `<span style="background-color: #e67e22; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.82rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">TW</span>`}
-                                    <span style="color:#4b5563; font-size:1.02rem; font-family:var(--font-mono); font-weight:500;">${displaySymbol}</span>
+                                    ${isHKLine ? `<span style="background-color: #5c3ec2; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">HK</span>` : `<span style="background-color: #e67e22; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">TW</span>`}
+                                    <span style="color:#4b5563; font-size:0.85rem; font-family:var(--font-mono); font-weight:500;">${displaySymbol}</span>
                                 </div>
                             </div>
                             <!-- Column 2: 賣出數量/價格 -->
                             <div style="width: 38%; text-align:center; flex-shrink: 0; display:flex; flex-direction:column; gap: 4px;">
-                                <div style="font-family:var(--font-mono); color:#222; font-size:1.15rem;">${formatNumber(h.shares, 0)}</div>
-                                <div style="font-family:var(--font-mono); color:#4b5563; font-size:1.02rem;">${formatNumber(h.price || h.sellPrice || 0)}</div>
+                                <div style="font-family:var(--font-mono); color:#222; font-size:0.9rem;">${formatNumber(h.shares, 0)}</div>
+                                <div style="font-family:var(--font-mono); color:#4b5563; font-size:0.85rem;">${formatNumber(h.price || h.sellPrice || 0)}</div>
                             </div>
                             <!-- Column 3: 損益/損益率 -->
                             <div style="width: 36%; text-align:right; flex-shrink: 0; display:flex; flex-direction:column; gap: 4px; padding-right: 4px;">
-                                <div style="font-family:var(--font-mono); color:${pnlColor}; font-size:1.15rem;">${h.profit >= 0 ? '+' : ''}${formatNumber(h.profit)}</div>
-                                <div style="font-family:var(--font-mono); color:${pnlColor}; font-size:1.02rem;">${h.profit >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%</div>
+                                <div style="font-family:var(--font-mono); color:${pnlColor}; font-size:0.9rem;">${h.profit >= 0 ? '+' : ''}${formatNumber(h.profit)}</div>
+                                <div style="font-family:var(--font-mono); color:${pnlColor}; font-size:0.85rem;">${h.profit >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%</div>
                             </div>
                         </div>
                     `;
