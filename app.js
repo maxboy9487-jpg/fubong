@@ -382,12 +382,13 @@ function processOrderExecution(order, execPrice) {
     let totalProceeds = twdValue - fee - tax;
     order.fee = fee; order.tax = tax;
 
-    let __y = "2026";
-    let __m = "04";
-    let __d = "23";
-    let __h = "14";
-    let __min = "58";
-    let __s = String(Math.floor(Math.random() * 60)).padStart(2, '0');
+    let __now = new Date();
+    let __y = String(__now.getFullYear());
+    let __m = String(__now.getMonth() + 1).padStart(2, '0');
+    let __d = String(__now.getDate()).padStart(2, '0');
+    let __h = String(__now.getHours()).padStart(2, '0');
+    let __min = String(__now.getMinutes()).padStart(2, '0');
+    let __s = String(__now.getSeconds()).padStart(2, '0');
     let fullTimeStr = `${__y}/${__m}/${__d} ${__h}:${__min}:${__s}`;
 
     // Find corresponding position based on marginType
@@ -1855,11 +1856,11 @@ window.switchPortfolioTab = function (tab, skipToast) {
         if (el && line) {
             if (t === tab) {
                 el.style.fontWeight = 'bold';
-                el.style.color = '#222';
-                line.style.backgroundColor = '#222';
+                el.style.color = '#ffffff';
+                line.style.backgroundColor = '#ffffff';
             } else {
                 el.style.fontWeight = 'normal';
-                el.style.color = '#666';
+                el.style.color = '#888888';
                 line.style.backgroundColor = 'transparent';
             }
         }
@@ -1934,27 +1935,27 @@ function renderPortfolioPage() {
         const labels = { trade: '下單', orders: '委成回', history: '損益', temp: '暫存匣', other: '其他' };
         const isActive = window.portfolioTab === tab;
         return `
-            <div id="portfolio-tab-${tab}" style="position:relative; cursor:pointer; font-weight: ${isActive ? 'bold' : 'normal'}; color: ${isActive ? '#222' : '#666'}; font-size:1.15rem; padding-bottom: 8px;" onclick="window.switchPortfolioTab('${tab}')">
+            <div id="portfolio-tab-${tab}" style="position:relative; cursor:pointer; font-weight: ${isActive ? 'bold' : 'normal'}; color: ${isActive ? '#ffffff' : '#888888'}; font-size:1.15rem; padding-bottom: 8px;" onclick="window.switchPortfolioTab('${tab}')">
                 ${labels[tab]}
-                <div id="portfolio-tab-line-${tab}" style="position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:100%; height:3px; background-color: ${isActive ? '#222' : 'transparent'}; border-radius:3px;"></div>
+                <div id="portfolio-tab-line-${tab}" style="position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:100%; height:3px; background-color: ${isActive ? '#ffffff' : 'transparent'}; border-radius:3px;"></div>
             </div>`;
     }).join('');
 
     let topHtml = `
-        <div style="background-color: #ffffff; color: #333; margin: 0; padding: 0;">
+        <div style="background-color: #0d0d0d; color: #dddddd; margin: 0; padding: 0;">
           <div style="display:flex; align-items:center; gap: 8px; margin-bottom: 16px; padding: 12px 14px 0 14px;">
-            <div style="background:#f2f2f2; border-radius: 8px; width: 44px; height: 38px; display:flex; justify-content:center; align-items:center; cursor:pointer;" onclick="renderPage('home')">
-                <i class="fa-solid fa-arrow-left" style="font-size:1.2rem; color:#333;"></i>
+            <div style="background:#2a2a2a; border-radius: 8px; width: 44px; height: 38px; display:flex; justify-content:center; align-items:center; cursor:pointer;" onclick="renderPage('home')">
+                <i class="fa-solid fa-arrow-left" style="font-size:1.2rem; color:#dddddd;"></i>
             </div>
-            <div style="background:#f2f2f2; border-radius: 8px; height: 38px; padding: 0 12px; display:flex; align-items:center; gap: 8px; cursor:pointer;" onclick="window.renderAccountSelectionOverlay()">
-                <span style="font-size:1.05rem; font-weight:500;">${accountTypeLabel}</span>
-                <i class="fa-solid fa-chevron-down" style="font-size:0.85rem; color:#333;"></i>
+            <div style="background:#2a2a2a; border-radius: 8px; height: 38px; padding: 0 12px; display:flex; align-items:center; gap: 8px; cursor:pointer;" onclick="window.renderAccountSelectionOverlay()">
+                <span style="font-size:1.05rem; font-weight:500; color:#dddddd;">${accountTypeLabel}</span>
+                <i class="fa-solid fa-chevron-down" style="font-size:0.85rem; color:#aaaaaa;"></i>
             </div>
-            <div style="background:#f2f2f2; border-radius: 8px; height: 38px; padding: 0 12px; display:flex; align-items:center; flex: 1; cursor:pointer;" onclick="window.renderAccountSelectionOverlay()">
-                <span style="font-size:1.05rem; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${state.currentBranch}</span>
+            <div style="background:#2a2a2a; border-radius: 8px; height: 38px; padding: 0 12px; display:flex; align-items:center; flex: 1; cursor:pointer;" onclick="window.renderAccountSelectionOverlay()">
+                <span style="font-size:1.05rem; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#dddddd;">${state.currentBranch}</span>
             </div>
           </div>
-          <div style="display:flex; overflow-x:auto; background:#ffffff; align-items:center; gap: 20px; padding: 0 16px; border-bottom: 1px solid #ddd;">
+          <div style="display:flex; overflow-x:auto; background:#0d0d0d; align-items:center; gap: 20px; padding: 0 16px; border-bottom: 1px solid #2a2a2a;">
              ${tabsHtml}
           </div>
         </div>
@@ -1983,7 +1984,7 @@ function getPortfolioTabContent() {
     }
 
     if (window.portfolioTab === 'temp' || window.portfolioTab === 'other') {
-        return '<div style="background-color:#ffffff; min-height:100vh; text-align:center; padding: 3rem 1rem; color:#555; font-size:0.95rem;">此功能無資料顯示</div>';
+        return '<div style="background-color:#0d0d0d; min-height:100vh; text-align:center; padding: 3rem 1rem; color:#888; font-size:0.95rem;">此功能無資料顯示</div>';
     }
 
     if (window.portfolioTab === 'inventory') {
@@ -2234,11 +2235,11 @@ function getPortfolioTabContent() {
         if (!window.ordersSubTab) window.ordersSubTab = 'orders';
 
         let ordersHtml = `
-            <div style="background-color: #ffffff; min-height: 100vh; color: #333; padding: 12px 16px;">
+            <div style="background-color: #0d0d0d; min-height: 100vh; color: #dddddd; padding: 12px 16px;">
                 <!-- Pill group -->
-                <div style="display:flex; background-color: #e2e5e7; border-radius: 6px; padding: 3px; margin-bottom: 10px;">
-                    <div style="flex:1; text-align:center; padding: 5px 0; border-radius: 4px; cursor:pointer; font-weight:bold; font-size:0.88rem; transition: all 0.2s; ${window.ordersSubTab === 'orders' ? 'background-color: #0086bd; color: white;' : 'color: #555;'}" onclick="window.ordersSubTab='orders'; window.switchPortfolioTab('orders', true);">委託回報</div>
-                    <div style="flex:1; text-align:center; padding: 5px 0; border-radius: 4px; cursor:pointer; font-weight:bold; font-size:0.88rem; transition: all 0.2s; ${window.ordersSubTab === 'trades' ? 'background-color: #0086bd; color: white;' : 'color: #555;'}" onclick="window.ordersSubTab='trades'; window.switchPortfolioTab('orders', true);">成交回報</div>
+                <div style="display:flex; background-color: #1a1a1a; border-radius: 6px; padding: 3px; margin-bottom: 10px;">
+                    <div style="flex:1; text-align:center; padding: 5px 0; border-radius: 4px; cursor:pointer; font-weight:bold; font-size:0.88rem; transition: all 0.2s; ${window.ordersSubTab === 'orders' ? 'background-color: #0086bd; color: white;' : 'color: #aaa;'}" onclick="window.ordersSubTab='orders'; window.switchPortfolioTab('orders', true);">委託回報</div>
+                    <div style="flex:1; text-align:center; padding: 5px 0; border-radius: 4px; cursor:pointer; font-weight:bold; font-size:0.88rem; transition: all 0.2s; ${window.ordersSubTab === 'trades' ? 'background-color: #0086bd; color: white;' : 'color: #aaa;'}" onclick="window.ordersSubTab='trades'; window.switchPortfolioTab('orders', true);">成交回報</div>
                 </div>
                 
                 <!-- Filter Bar -->
@@ -2296,7 +2297,7 @@ function getPortfolioTabContent() {
                     let chevronClass = isExpanded ? 'fa-chevron-up' : 'fa-chevron-down';
 
                     ordersHtml += `
-                        <div style="display:flex; flex-direction:column; border-bottom: 1px solid #eee;">
+                        <div style="display:flex; flex-direction:column; border-bottom: 1px solid #2a2a2a;">
                             <div style="display:flex; align-items:stretch; padding: 9px 0; cursor:pointer;" onclick="window.toggleOrderExpand(${o.id})">
                                 <div style="flex:1.6; display:flex; align-items:center; gap:6px; text-align:left; padding-left:8px; min-width: 0;">
                                     ${isCancellable ? `
@@ -2305,7 +2306,7 @@ function getPortfolioTabContent() {
                                     </div>
                                     ` : ''}
                                     <div style="display:flex; flex-direction:column; gap:3px; min-width: 0; justify-content:center;">
-                                        <div style="font-weight:bold; font-size:0.9rem; color:#222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${o.name}</div>
+                                        <div style="font-weight:bold; font-size:0.9rem; color:#dddddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${o.name}</div>
                                         <div style="display:flex; align-items:center; gap:4px;">
                                             ${isHKLine ? `<span style="background-color:#7e57c2; color:white; padding:1px 3px; border-radius:3px; font-size:0.7rem; font-weight:bold;">HK</span>` : `<span style="background-color:#ffa726; color:white; padding:1px 3px; border-radius:3px; font-size:0.7rem; font-weight:bold;">TW</span>`}
                                             <span style="color:${sideColor}; font-size:0.78rem; font-weight:bold;">${o.side === 'buy' ? '買進' : '賣出'}</span>
@@ -2314,17 +2315,17 @@ function getPortfolioTabContent() {
                                     </div>
                                 </div>
                                 <div style="flex:1.1; display:flex; flex-direction:column; gap:3px; justify-content:center; text-align:right; padding-right:12px;">
-                                    <div style="font-size:0.9rem; color:#222; font-family:var(--font-mono);">${formatNumber(o.shares, 0)}股</div>
-                                    <div style="font-size:0.9rem; color:#222; font-family:var(--font-mono);">${o.status === 'executed' ? formatNumber(execShares, 0) + '股' : '-'}</div>
+                                    <div style="font-size:0.9rem; color:#cccccc; font-family:var(--font-mono);">${formatNumber(o.shares, 0)}股</div>
+                                    <div style="font-size:0.9rem; color:#cccccc; font-family:var(--font-mono);">${o.status === 'executed' ? formatNumber(execShares, 0) + '股' : '-'}</div>
                                 </div>
                                 <div style="flex:1.2; display:flex; flex-direction:column; gap:3px; justify-content:center; text-align:right; padding-right:12px;">
-                                    <div style="font-size:0.9rem; color:#222; font-family:var(--font-mono);">${formatNumber(o.price, isHKLine ? 2 : 0)}</div>
-                                    <div style="font-size:0.9rem; color:#222; font-family:var(--font-mono);">${o.status === 'executed' ? formatNumber(execAvgPrice, isHKLine ? 2 : 0) : '-'}</div>
+                                    <div style="font-size:0.9rem; color:#cccccc; font-family:var(--font-mono);">${formatNumber(o.price, isHKLine ? 2 : 0)}</div>
+                                    <div style="font-size:0.9rem; color:#cccccc; font-family:var(--font-mono);">${o.status === 'executed' ? formatNumber(execAvgPrice, isHKLine ? 2 : 0) : '-'}</div>
                                 </div>
                                 <div style="flex:0.9; display:flex; align-items:center; justify-content:flex-end; gap:8px; padding-right:8px;">
                                     <div style="display:flex; flex-direction:column; align-items:flex-end; justify-content:center;">
-                                        <div style="font-size:0.88rem; color:#222; font-weight:600; line-height:1.15;">${statusTop}</div>
-                                        <div style="font-size:0.88rem; color:#222; font-weight:600; line-height:1.15;">${statusBottom}</div>
+                                        <div style="font-size:0.88rem; color:#dddddd; font-weight:600; line-height:1.15;">${statusTop}</div>
+                                        <div style="font-size:0.88rem; color:#dddddd; font-weight:600; line-height:1.15;">${statusBottom}</div>
                                     </div>
                                     <div style="display:flex; align-items:center; justify-content:center; width:12px; flex-shrink:0;">
                                         <i class="fa-solid ${chevronClass}" style="font-size:0.65rem; color:#666;"></i>
@@ -2332,7 +2333,7 @@ function getPortfolioTabContent() {
                                 </div>
                             </div>
                             ${isExpanded ? `
-                            <div style="background-color: #f2f3f5; border-radius: 8px; padding: 8px 12px; margin: 0px 8px 10px 8px; font-size: 0.82rem; color: #333; display: flex; flex-direction: column; gap: 5px;">
+                            <div style="background-color: #181818; border-radius: 8px; padding: 8px 12px; margin: 0px 8px 10px 8px; font-size: 0.82rem; color: #ccc; display: flex; flex-direction: column; gap: 5px;">
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <span style="color:#666;">觸價價格</span>
                                     <span style="font-family:var(--font-mono); font-weight:500;">-</span>
@@ -2383,11 +2384,11 @@ function getPortfolioTabContent() {
                     let chevronClass = isExpanded ? 'fa-chevron-up' : 'fa-chevron-down';
 
                     ordersHtml += `
-                        <div style="display:flex; flex-direction:column; border-bottom: 1px solid #eee;">
+                        <div style="display:flex; flex-direction:column; border-bottom: 1px solid #2a2a2a;">
                             <div style="display:flex; align-items:stretch; padding: 9px 0; cursor:pointer;" onclick="window.toggleTradeExpand(${h.id})">
                                 <div style="flex:1.6; display:flex; align-items:center; gap:6px; text-align:left; padding-left:8px; min-width: 0;">
                                     <div style="display:flex; flex-direction:column; gap:3px; min-width: 0; justify-content:center;">
-                                        <div style="font-weight:bold; font-size:0.9rem; color:#222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${h.name}</div>
+                                        <div style="font-weight:bold; font-size:0.9rem; color:#dddddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${h.name}</div>
                                         <div style="display:flex; align-items:center; gap:4px;">
                                             ${isHKLine ? `<span style="background-color:#7e57c2; color:white; padding:1px 3px; border-radius:3px; font-size:0.7rem; font-weight:bold;">HK</span>` : `<span style="background-color:#ffa726; color:white; padding:1px 3px; border-radius:3px; font-size:0.7rem; font-weight:bold;">TW</span>`}
                                             <span style="color:#888; font-size:0.8rem; font-family:var(--font-mono); font-weight:500;">${h.symbol}</span>
@@ -2400,8 +2401,8 @@ function getPortfolioTabContent() {
                                 </div>
                                 <div style="flex:1.2; display:flex; align-items:center; justify-content:flex-end; gap:8px; padding-right:8px;">
                                     <div style="display:flex; flex-direction:column; justify-content:center; text-align:right;">
-                                        <div style="font-size:0.9rem; color:#222; font-family:var(--font-mono);">${formatNumber(tradePrice, isHKLine ? 2 : 0)}</div>
-                                        <div style="font-size:0.9rem; color:#222; font-family:var(--font-mono);">${formatNumber(h.shares, 0)}股</div>
+                                        <div style="font-size:0.9rem; color:#cccccc; font-family:var(--font-mono);">${formatNumber(tradePrice, isHKLine ? 2 : 0)}</div>
+                                        <div style="font-size:0.9rem; color:#cccccc; font-family:var(--font-mono);">${formatNumber(h.shares, 0)}股</div>
                                     </div>
                                     <div style="display:flex; align-items:center; justify-content:center; width:12px; flex-shrink:0;">
                                         <i class="fa-solid ${chevronClass}" style="font-size:0.65rem; color:#666;"></i>
@@ -2409,7 +2410,7 @@ function getPortfolioTabContent() {
                                 </div>
                             </div>
                             ${isExpanded ? `
-                            <div style="background-color: #f2f3f5; border-radius: 8px; padding: 8px 12px; margin: 0px 8px 10px 8px; font-size: 0.82rem; color: #333; display: flex; flex-direction: column; gap: 5px;">
+                            <div style="background-color: #181818; border-radius: 8px; padding: 8px 12px; margin: 0px 8px 10px 8px; font-size: 0.82rem; color: #ccc; display: flex; flex-direction: column; gap: 5px;">
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <span style="color:#666;">成交市值</span>
                                     <span style="font-family:var(--font-mono); font-weight:500;">${formatNumber(h.shares * tradePrice, isHKLine ? 2 : 0)}</span>
@@ -2440,11 +2441,11 @@ function getPortfolioTabContent() {
         if (typeof window.pnlCardExpanded === 'undefined') window.pnlCardExpanded = false;
 
         let contentHtml = `
-            <div style="background-color: #ffffff; min-height: 100vh; color: #333; padding: 16px;">
+            <div style="background-color: #0d0d0d; min-height: 100vh; color: #dddddd; padding: 16px;">
                 <!-- Pill group -->
-                <div style="display:flex; background-color: #e2e5e7; border-radius: 6px; padding: 3px; margin-bottom: 12px;">
-                    <div style="flex:1; text-align:center; padding: 6px 0; border-radius: 4px; cursor:pointer; font-weight:bold; font-size:0.92rem; transition: all 0.2s; ${window.historySubTab === 'unrealized' ? 'background-color: #1a92bc; color: white;' : 'color: #555;'}" onclick="window.historySubTab='unrealized'; window.switchPortfolioTab('history');">未實現損益</div>
-                    <div style="flex:1; text-align:center; padding: 6px 0; border-radius: 4px; cursor:pointer; font-weight:bold; font-size:0.92rem; transition: all 0.2s; ${window.historySubTab === 'realized' ? 'background-color: #1a92bc; color: white;' : 'color: #555;'}" onclick="window.historySubTab='realized'; window.switchPortfolioTab('history');">已實現損益</div>
+                <div style="display:flex; background-color: #1a1a1a; border-radius: 6px; padding: 3px; margin-bottom: 12px;">
+                    <div style="flex:1; text-align:center; padding: 6px 0; border-radius: 4px; cursor:pointer; font-weight:bold; font-size:0.92rem; transition: all 0.2s; ${window.historySubTab === 'unrealized' ? 'background-color: #1a92bc; color: white;' : 'color: #aaa;'}" onclick="window.historySubTab='unrealized'; window.switchPortfolioTab('history');">未實現損益</div>
+                    <div style="flex:1; text-align:center; padding: 6px 0; border-radius: 4px; cursor:pointer; font-weight:bold; font-size:0.92rem; transition: all 0.2s; ${window.historySubTab === 'realized' ? 'background-color: #1a92bc; color: white;' : 'color: #aaa;'}" onclick="window.historySubTab='realized'; window.switchPortfolioTab('history');">已實現損益</div>
                 </div>
         `;
 
@@ -2492,7 +2493,7 @@ function getPortfolioTabContent() {
 
             // Filter Bar
             contentHtml += `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; color: #333; font-weight: bold;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; color: #dddddd; font-weight: bold;">
                     <div style="display:flex; align-items:center; gap: 4px; cursor:pointer; font-size:1.05rem;">
                         <span>全部市場</span>
                         <i class="fa-solid fa-chevron-down" style="font-size:0.85rem;"></i>
@@ -2503,18 +2504,18 @@ function getPortfolioTabContent() {
                 </div>
 
                 <!-- Summary Card -->
-                <div style="background-color: #f2f2f2; border-radius: 16px; padding: 16px; margin-bottom: 16px; display:flex; flex-direction:column; gap: 10px; position:relative;">
+                <div style="background-color: #181818; border-radius: 16px; padding: 16px; margin-bottom: 16px; display:flex; flex-direction:column; gap: 10px; position:relative;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight: 600; color: #111; font-size: 1.05rem;">總預估現值(約當台幣)</span>
-                        <span style="font-weight: normal; color: #111; font-size: 1.15rem; font-family:var(--font-mono);">${formatNumber(totalEstValueTwd)}</span>
+                        <span style="font-weight: 600; color: #dddddd; font-size: 1.05rem;">總預估現值(約當台幣)</span>
+                        <span style="font-weight: normal; color: #dddddd; font-size: 1.15rem; font-family:var(--font-mono);">${formatNumber(totalEstValueTwd)}</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.92rem;">
                         <span style="color: #666; font-weight: normal;">總損益試算約當台幣</span>
                         <span style="font-weight: normal; color: ${twdPnlColor}; font-family:var(--font-mono); font-size: 0.98rem;">${totalPnlTwd >= 0 ? '+' : ''}${formatNumber(totalPnlTwd)}(${totalPnlTwd >= 0 ? '+' : ''}${totalPnlPctTwd.toFixed(2)}%)</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.92rem;">
-                        <span style="color: #666; font-weight: normal;">總付出成本約當台幣</span>
-                        <span style="font-weight: normal; color: #111; font-family:var(--font-mono); font-size: 0.98rem;">${formatNumber(totalCostTwd)}</span>
+                        <span style="color: #aaaaaa; font-weight: normal;">總付出成本約當台幣</span>
+                        <span style="font-weight: normal; color: #dddddd; font-family:var(--font-mono); font-size: 0.98rem;">${formatNumber(totalCostTwd)}</span>
                     </div>
             `;
 
@@ -2522,16 +2523,16 @@ function getPortfolioTabContent() {
                 contentHtml += `
                     <div style="border-bottom: 1px solid #ddd; margin: 4px 0;"></div>
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.92rem;">
-                        <span style="color: #666; font-weight: normal;">總預估現值(港幣)</span>
-                        <span style="font-weight: normal; color: #111; font-family:var(--font-mono); font-size: 0.98rem;">${formatNumber(totalEstValueHkd)}</span>
+                        <span style="color: #aaaaaa; font-weight: normal;">總預估現值(港幣)</span>
+                        <span style="font-weight: normal; color: #dddddd; font-family:var(--font-mono); font-size: 0.98rem;">${formatNumber(totalEstValueHkd)}</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.92rem;">
                         <span style="color: #666; font-weight: normal;">總損益試算港幣</span>
                         <span style="font-weight: normal; color: ${hkdPnlColor}; font-family:var(--font-mono); font-size: 0.98rem;">${totalPnlHkd >= 0 ? '+' : ''}${formatNumber(totalPnlHkd)}(${totalPnlHkd >= 0 ? '+' : ''}${totalPnlPctHkd.toFixed(2)}%)</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.92rem;">
-                        <span style="color: #666; font-weight: normal;">總付出成本港幣</span>
-                        <span style="font-weight: normal; color: #111; font-family:var(--font-mono); font-size: 0.98rem;">${formatNumber(totalCostHkd)}</span>
+                        <span style="color: #aaaaaa; font-weight: normal;">總付出成本港幣</span>
+                        <span style="font-weight: normal; color: #dddddd; font-family:var(--font-mono); font-size: 0.98rem;">${formatNumber(totalCostHkd)}</span>
                     </div>
                 `;
             }
@@ -2583,23 +2584,23 @@ function getPortfolioTabContent() {
                     let displaySymbol = pos.symbol.startsWith('00') ? pos.symbol.slice(1) : pos.symbol;
  
                     contentHtml += `
-                        <div style="display:flex; align-items:center; border-bottom: 1px solid #eee; padding: 9px 0; font-size: 0.9rem;">
+                        <div style="display:flex; align-items:center; border-bottom: 1px solid #2a2a2a; padding: 9px 0; font-size: 0.9rem;">
                             <!-- Stock Info -->
                             <div style="width: 26%; text-align:left; flex-shrink: 0; display:flex; flex-direction:column; gap: 4px; min-width: 0; padding-left: 8px;">
-                                <span style="font-weight: bold; color: #000000; font-size: 1.02rem; line-height: 1.1; display: inline-block; max-width: 4em; word-break: break-all; white-space: normal;">
+                                <span style="font-weight: bold; color: #dddddd; font-size: 1.02rem; line-height: 1.1; display: inline-block; max-width: 4em; word-break: break-all; white-space: normal;">
                                     ${pos.name}
                                 </span>
                                 <div style="display:flex; align-items:center; white-space: nowrap; margin-top: 4px;">
                                     ${isHKPos ? `<span style="background-color: #5c3ec2; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">HK</span>` : `<span style="background-color: #e67e22; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">TW</span>`}
-                                    <span style="color: #4b5563; font-size: 0.85rem; font-weight: 500; font-family:var(--font-mono);">${displaySymbol}</span>
+                                    <span style="color: #aaaaaa; font-size: 0.85rem; font-weight: 500; font-family:var(--font-mono);">${displaySymbol}</span>
                                 </div>
                             </div>
                             <!-- Shares (今餘) -->
-                            <div style="width: 14%; text-align:center; flex-shrink: 0; font-family:var(--font-mono); color: #222; white-space: nowrap; font-size: 0.9rem; font-weight: normal;">
+                            <div style="width: 14%; text-align:center; flex-shrink: 0; font-family:var(--font-mono); color: #cccccc; white-space: nowrap; font-size: 0.9rem; font-weight: normal;">
                                 ${formatNumber(pos.shares, 0)}
                             </div>
                             <!-- Available (可賣) -->
-                            <div style="width: 18%; text-align:center; flex-shrink: 0; font-family:var(--font-mono); color: #222; white-space: nowrap; font-size: 0.9rem; font-weight: normal;">
+                            <div style="width: 18%; text-align:center; flex-shrink: 0; font-family:var(--font-mono); color: #cccccc; white-space: nowrap; font-size: 0.9rem; font-weight: normal;">
                                 ${formatNumber(pos.shares, 0)}
                             </div>
                             <!-- PnL (損益) -->
@@ -2628,7 +2629,7 @@ function getPortfolioTabContent() {
 
             // Filter Bar
             contentHtml += `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; color: #333; font-weight: bold;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; color: #dddddd; font-weight: bold;">
                     <div style="display:flex; align-items:center; gap: 4px; cursor:pointer; font-size:1.05rem;">
                         <span>全部市場</span>
                         <i class="fa-solid fa-chevron-down" style="font-size:0.85rem;"></i>
@@ -2639,7 +2640,7 @@ function getPortfolioTabContent() {
                 </div>
 
                 <!-- Summary Card -->
-                <div style="background-color: #f2f2f2; border-radius: 16px; padding: 16px; margin-bottom: 16px; display:flex; flex-direction:column; gap: 6px; position:relative;">
+                <div style="background-color: #181818; border-radius: 16px; padding: 16px; margin-bottom: 16px; display:flex; flex-direction:column; gap: 6px; position:relative;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span style="font-weight: 500; color: #666; font-size: 0.95rem;">今日已實現損益加總(約當台幣)</span>
                         <i class="fa-solid fa-chevron-down" style="font-size:1rem; color:#666; cursor:pointer;"></i>
@@ -2700,19 +2701,19 @@ function getPortfolioTabContent() {
                     let isHKLine = stockH && stockH.isHK;
                     let pnlPct = (h.buyAvgPrice && h.shares) ? (h.profit / (h.buyAvgPrice * h.shares)) * 100 : 0;
                     sellsHtml += `
-                        <div style="display:flex; align-items:center; border-bottom: 1px solid #eee; padding: 9px 0;">
+                        <div style="display:flex; align-items:center; border-bottom: 1px solid #2a2a2a; padding: 9px 0;">
                             <!-- Column 1: 商品 -->
                             <div style="width: 26%; text-align:left; flex-shrink: 0; display:flex; flex-direction:column; gap: 4px; min-width: 0; padding-left: 8px;">
-                                <div style="font-weight:bold; color:#000000; font-size:1.02rem; line-height: 1.1; display: inline-block; max-width: 4em; word-break: break-all; white-space: normal;">${h.name}</div>
+                                <div style="font-weight:bold; color:#dddddd; font-size:1.02rem; line-height: 1.1; display: inline-block; max-width: 4em; word-break: break-all; white-space: normal;">${h.name}</div>
                                 <div style="display:flex; align-items:center; margin-top: 4px; white-space: nowrap;">
                                     ${isHKLine ? `<span style="background-color: #5c3ec2; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">HK</span>` : `<span style="background-color: #e67e22; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">TW</span>`}
-                                    <span style="color:#4b5563; font-size:0.85rem; font-family:var(--font-mono); font-weight:500;">${displaySymbol}</span>
+                                    <span style="color:#aaaaaa; font-size:0.85rem; font-family:var(--font-mono); font-weight:500;">${displaySymbol}</span>
                                 </div>
                             </div>
                             <!-- Column 2: 賣出數量/價格 -->
                             <div style="width: 38%; text-align:center; flex-shrink: 0; display:flex; flex-direction:column; gap: 4px;">
-                                <div style="font-family:var(--font-mono); color:#222; font-size:0.9rem;">${formatNumber(h.shares, 0)}</div>
-                                <div style="font-family:var(--font-mono); color:#4b5563; font-size:0.85rem;">${formatNumber(h.price || h.sellPrice || 0)}</div>
+                                <div style="font-family:var(--font-mono); color:#cccccc; font-size:0.9rem;">${formatNumber(h.shares, 0)}</div>
+                                <div style="font-family:var(--font-mono); color:#aaaaaa; font-size:0.85rem;">${formatNumber(h.price || h.sellPrice || 0)}</div>
                             </div>
                             <!-- Column 3: 損益/損益率 -->
                             <div style="width: 36%; text-align:right; flex-shrink: 0; display:flex; flex-direction:column; gap: 4px; padding-right: 4px;">
@@ -2940,7 +2941,7 @@ function renderMorePage() {
                     <div style="display:flex; gap:10px; align-items:center;">
                         <span style="font-size:0.9rem; color:#888; white-space:nowrap; width:120px;">選擇股票:</span>
                         <select id="more-change-stock-select" style="flex:1; background:#111; border:1px solid #444; color:white; padding:8px; border-radius:8px; font-size:0.95rem; font-weight:600; outline:none; height:38px;">
-                            ${state.marketData.filter(s => !s.isIndex).map(s => `<option value="${s.symbol}">${s.name} (${s.symbol}) - 目前: ${s.price}</option>`).join('')}
+                            ${state.marketData.filter(s => !s.isIndex).map(s => `<option value="${s.symbol}">${s.name} (${s.symbol})</option>`).join('')}
                         </select>
                     </div>
                     <div style="display:flex; gap:10px; align-items:center;">
