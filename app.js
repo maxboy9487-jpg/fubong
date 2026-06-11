@@ -27,19 +27,40 @@ window.togglePortfolioRow = function (symbol) {
     }
 };
 
+const generateRandomId = () => Math.floor(1000000 + Math.random() * 9000000).toString();
+function getOrGenerateAccount(type, branch) {
+    const key = `default_account_${type}_${branch}`;
+    let saved = localStorage.getItem(key);
+    if (!saved) {
+        saved = generateRandomId();
+        localStorage.setItem(key, saved);
+    }
+    return { type, branch, id: saved, name: '名稱' };
+}
+
 const DEFAULT_ACCOUNTS = [
-    { branch: '台南', id: '3815467' },
-    { branch: '台北', id: '7884943' },
-    { branch: '松江', id: '8927384' },
-    { branch: '台南', id: '4108526' },
-    { branch: '台北', id: '1185773' },
-    { branch: '高雄', id: '5478879' }
+    getOrGenerateAccount('TW', '松江'),
+    getOrGenerateAccount('HK', '營業部')
 ];
 
 let customAccounts = JSON.parse(localStorage.getItem('stockCustomAccounts') || '[]');
 let ACCOUNTS = [...DEFAULT_ACCOUNTS, ...customAccounts];
 
 window.currentAccountId = localStorage.getItem('stockCurrentAccount');
+
+const getAccountDisplayName = (account) => {
+    if (!account) return '';
+    const prefix = account.type === 'HK' ? '復' : '證';
+    const nameStr = account.name || '名稱';
+    return `${prefix}-${account.branch}${account.id}-${nameStr}`;
+};
+
+if (!window.currentAccountId && ACCOUNTS.length > 0) {
+    window.currentAccountId = ACCOUNTS[0].id;
+    localStorage.setItem('stockCurrentAccount', window.currentAccountId);
+}
+const initialAccount = ACCOUNTS.find(a => a.id === window.currentAccountId) || ACCOUNTS[0];
+
 
 const state = {
     currentPage: 'home', previousPage: 'home', currentStock: null, tradeTarget: null,
@@ -61,7 +82,7 @@ const state = {
     triggers: [],
     watchlist: ['2330', '2454', '00326'],
     marketData: window.parsedMarketData || [],
-    currentBranch: `(台)台南 3815467`
+    currentBranch: getAccountDisplayName(initialAccount)
 };
 
 window.switchAccount = function (id) {
@@ -70,7 +91,8 @@ window.switchAccount = function (id) {
     localStorage.setItem('stockCurrentAccount', id);
 
     const account = ACCOUNTS.find(a => a.id === id);
-    if (account) state.currentBranch = `(台)${account.branch} ${account.id}`;
+    if (account) state.currentBranch = getAccountDisplayName(account);
+
 
     resetStateInMemory();
     loadState();
@@ -101,15 +123,19 @@ window.renderAccountSelectionOverlay = function () {
     const overlay = document.createElement('div');
     overlay.className = 'account-selection-overlay';
 
-    let accountsHtml = ACCOUNTS.map(acc => `
-        <div class="account-card ${window.currentAccountId === acc.id ? 'active' : ''}" onclick="window.switchAccount('${acc.id}')">
-            <div>
-                <div class="branch">${acc.branch} 分公司</div>
-                <div class="id">${acc.id}</div>
+    let accountsHtml = ACCOUNTS.map(acc => {
+        const displayName = getAccountDisplayName(acc);
+        const typeLabel = acc.type === 'HK' ? '海外股' : '台股';
+        return `
+            <div class="account-card ${window.currentAccountId === acc.id ? 'active' : ''}" onclick="window.switchAccount('${acc.id}')">
+                <div>
+                    <div class="branch">${acc.branch} ${typeLabel}</div>
+                    <div class="id">${displayName}</div>
+                </div>
+                <div class="arrow"><i class="fa-solid fa-chevron-right"></i></div>
             </div>
-            <div class="arrow"><i class="fa-solid fa-chevron-right"></i></div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 
     overlay.innerHTML = `
         <div class="account-selection-container">
@@ -136,10 +162,14 @@ window.renderAccountSelectionOverlay = function () {
 window.promptAddAccount = function () {
     const branch = prompt('請輸入分公司地區 (例如: 台中)');
     if (!branch) return;
+    const isHK = confirm('是否為海外股帳戶？\n[確定] 海外股 (復-xxx0000000-名稱)\n[取消] 台股 (證-xxx0000000-名稱)');
+    const type = isHK ? 'HK' : 'TW';
     const id = prompt('請輸入帳號數字 (例如: 1234567)');
     if (!id) return;
+    const name = prompt('請輸入帳戶名稱/戶名 (例如: 王小明)');
+    if (!name) return;
 
-    const newAcc = { branch, id };
+    const newAcc = { type, branch, id, name };
     ACCOUNTS.push(newAcc);
 
     let custom = JSON.parse(localStorage.getItem('stockCustomAccounts') || '[]');
@@ -151,8 +181,9 @@ window.promptAddAccount = function () {
     if (overlay) document.body.removeChild(overlay);
     window.renderAccountSelectionOverlay();
 
-    showToast(`✅ 已新增帳戶: ${branch} ${id}`, 'success');
+    showToast(`✅ 已新增帳戶: ${getAccountDisplayName(newAcc)}`, 'success');
 };
+
 
 window.checkMarketStatus = function () {
     let now = new Date();
@@ -669,7 +700,7 @@ function initApp() {
         window.renderAccountSelectionOverlay();
     } else {
         const account = ACCOUNTS.find(a => a.id === window.currentAccountId);
-        if (account) state.currentBranch = `(台)${account.branch} ${account.id}`;
+        if (account) state.currentBranch = getAccountDisplayName(account);
         loadState();
     }
 
@@ -1896,6 +1927,9 @@ function renderPortfolioPage() {
     if (!['trade', 'orders', 'history', 'temp', 'other'].includes(window.portfolioTab)) {
         window.portfolioTab = 'trade';
     }
+    const currentAccount = ACCOUNTS.find(a => a.id === window.currentAccountId) || ACCOUNTS[0];
+    const accountTypeLabel = (currentAccount && currentAccount.type === 'HK') ? '海外股' : '台股';
+
     let tabsHtml = ['trade', 'orders', 'history', 'temp', 'other'].map(tab => {
         const labels = { trade: '下單', orders: '委成回', history: '損益', temp: '暫存匣', other: '其他' };
         const isActive = window.portfolioTab === tab;
@@ -1912,8 +1946,8 @@ function renderPortfolioPage() {
             <div style="background:#f2f2f2; border-radius: 8px; width: 44px; height: 38px; display:flex; justify-content:center; align-items:center; cursor:pointer;" onclick="renderPage('home')">
                 <i class="fa-solid fa-arrow-left" style="font-size:1.2rem; color:#333;"></i>
             </div>
-            <div style="background:#f2f2f2; border-radius: 8px; height: 38px; padding: 0 12px; display:flex; align-items:center; gap: 8px; cursor:pointer;">
-                <span style="font-size:1.05rem; font-weight:500;">海外股</span>
+            <div style="background:#f2f2f2; border-radius: 8px; height: 38px; padding: 0 12px; display:flex; align-items:center; gap: 8px; cursor:pointer;" onclick="window.renderAccountSelectionOverlay()">
+                <span style="font-size:1.05rem; font-weight:500;">${accountTypeLabel}</span>
                 <i class="fa-solid fa-chevron-down" style="font-size:0.85rem; color:#333;"></i>
             </div>
             <div style="background:#f2f2f2; border-radius: 8px; height: 38px; padding: 0 12px; display:flex; align-items:center; flex: 1; cursor:pointer;" onclick="window.renderAccountSelectionOverlay()">

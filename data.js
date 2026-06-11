@@ -2561,6 +2561,29 @@ window.parsedMarketData.push({
     isStatic: true, isHK: true 
 });
 
+window.parsedMarketData.push({ 
+    symbol: '01780', name: '榮尊國際控股', price: 2.33, change: 0.00, prevClose: 2.33, 
+    open: 2.33, high: 2.33, low: 2.33, volume: 100000, volumeStr: '10.0萬', turnoverAmount: '23.3萬', 
+    marketCap: '--', totalShares: '--', circulatingShares: '--', circulatingValue: '--',
+    peTTM: '--', peStatic: '--', pb: '--', peDynamic: '--',
+    turnoverRateStr: '--', bidRatio: '--', volumeRatio: '--', avgPriceStr: '2.33', amplitudeStr: '0.00%',
+    high52: 2.50, low52: 1.50, historyHigh: 3.00, historyLow: 1.00, lotSize: '2500股', lotSizeVal: 2500,
+    beta: 1.0, divYieldTTM: '--', divYieldLFY: '--', divYieldRateTTM: '--', divYieldRateLFY: '--',
+    isStatic: true, isHK: true 
+});
+
+window.parsedMarketData.push({ 
+    symbol: '01850', name: '鴻盛昌資源', price: 2.75, change: 0.00, prevClose: 2.75, 
+    open: 2.75, high: 2.75, low: 2.75, volume: 100000, volumeStr: '10.0萬', turnoverAmount: '27.5萬', 
+    marketCap: '--', totalShares: '--', circulatingShares: '--', circulatingValue: '--',
+    peTTM: '--', peStatic: '--', pb: '--', peDynamic: '--',
+    turnoverRateStr: '--', bidRatio: '--', volumeRatio: '--', avgPriceStr: '2.75', amplitudeStr: '0.00%',
+    high52: 3.00, low52: 2.00, historyHigh: 3.50, historyLow: 1.50, lotSize: '10000股', lotSizeVal: 10000,
+    beta: 1.0, divYieldTTM: '--', divYieldLFY: '--', divYieldRateTTM: '--', divYieldRateLFY: '--',
+    isStatic: true, isHK: true 
+});
+
+
 
 
 rawMarketData.trim().split('\n').forEach(line => {
