@@ -82,7 +82,8 @@ const state = {
     triggers: [],
     watchlist: ['2330', '2454', '00326'],
     marketData: window.parsedMarketData || [],
-    currentBranch: getAccountDisplayName(initialAccount)
+    currentBranch: getAccountDisplayName(initialAccount),
+    shouldMatchOrders: true
 };
 
 window.switchAccount = function (id) {
@@ -277,7 +278,23 @@ window.manualPriceUpdate = function (symbol, newPrice) {
     if (state.currentPage === 'portfolio') renderPage('portfolio');
     if (state.currentPage === 'stockDetail' && state.currentStock === symbol) renderPage('stockDetail');
     if (state.currentPage === 'home') renderPage('home');
-}
+};
+
+window.setOrderMatching = function (shouldMatch) {
+    state.shouldMatchOrders = shouldMatch;
+    saveState();
+    let msg = '已開啟自動成交';
+    let type = 'success';
+    if (shouldMatch === false) {
+        msg = '已關閉自動成交（委託將維持「委託傳送中」狀態）';
+        type = 'warning';
+    } else if (shouldMatch === 'failed') {
+        msg = '已設定委託狀態為「委託失敗」';
+        type = 'error';
+    }
+    showToast(msg, type);
+    if (state.currentPage === 'portfolio') renderPage('portfolio');
+};
 
 // --- Formatters & UI Helpers ---
 const formatNumber = (num, toFixed = 2) => {
@@ -553,7 +570,9 @@ function submitOrder(tradeParams, isTriggeredBySmart = false) {
 
     let executed = false; let execPrice = 0;
     // Market orders or Limit matching only if NOT in disposition delay AND Market is OPEN
-    if (order.status !== 'pending-disposition' && state.marketStatus === 'open') {
+    if (state.shouldMatchOrders === 'failed') {
+        order.status = 'failed';
+    } else if (state.shouldMatchOrders !== false && order.status !== 'pending-disposition' && state.marketStatus === 'open') {
         if (priceType === 'market') { executed = true; execPrice = stock.price; }
         else {
             if (side === 'buy' && limitPrice >= stock.price) { executed = true; execPrice = stock.price; }
@@ -563,7 +582,15 @@ function submitOrder(tradeParams, isTriggeredBySmart = false) {
 
     state.orders.unshift(order);
 
-    if (executed) {
+    if (order.status === 'failed') {
+        if (!isTriggeredBySmart) {
+            showToast('📤 委託已送出...', 'info');
+            setTimeout(() => {
+                showToast('❌ 委託失敗: 模擬撮合失敗 (委託已自動取消)', 'error');
+                if (state.currentPage === 'portfolio') renderPage('portfolio');
+            }, 800);
+        }
+    } else if (executed) {
         if (!isTriggeredBySmart) {
             showToast('📤 委託已送出...', 'info');
             setTimeout(() => {
@@ -1846,10 +1873,10 @@ function exportHistoryCSV() {
 window.exportHistoryCSV = exportHistoryCSV;
 
 window.switchPortfolioTab = function (tab, skipToast) {
-    if (!['trade', 'orders', 'history', 'temp', 'other'].includes(tab)) tab = 'trade';
+    if (!['trade', 'orders', 'history', 'temp', 'other', 'long-term'].includes(tab)) tab = 'trade';
     window.portfolioTab = tab;
 
-    ['trade', 'orders', 'history', 'temp', 'other'].forEach(t => {
+    ['trade', 'orders', 'history', 'temp', 'other', 'long-term'].forEach(t => {
         const el = document.getElementById(`portfolio-tab-${t}`);
         const line = document.getElementById(`portfolio-tab-line-${t}`);
         if (el && line) {
@@ -1930,8 +1957,8 @@ function renderPortfolioPage() {
     const currentAccount = ACCOUNTS.find(a => a.id === window.currentAccountId) || ACCOUNTS[0];
     const accountTypeLabel = (currentAccount && currentAccount.type === 'HK') ? '海外股' : '台股';
 
-    let tabsHtml = ['trade', 'orders', 'history', 'temp', 'other'].map(tab => {
-        const labels = { trade: '下單', orders: '委成回', history: '損益', temp: '暫存匣', other: '其他' };
+    let tabsHtml = ['trade', 'orders', 'history', 'temp', 'other', 'long-term'].map(tab => {
+        const labels = { trade: '下單', orders: '委成回', history: '損益', temp: '暫存匣', other: '其他', 'long-term': '長...' };
         const isActive = window.portfolioTab === tab;
         return `
             <div id="portfolio-tab-${tab}" style="position:relative; cursor:pointer; font-weight: ${isActive ? 'bold' : 'normal'}; color: ${isActive ? '#ffffff' : '#888888'}; font-size:1.15rem; padding-bottom: 8px;" onclick="window.switchPortfolioTab('${tab}')">
@@ -2224,8 +2251,25 @@ function getPortfolioTabContent() {
                     `).join('')}
                 </div>
                 
-                <div style="margin-top:24px; padding:12px; background:rgba(255,179,0,0.1); border:1px dashed rgba(255,179,0,0.3); border-radius:8px; color:rgba(255,179,0,0.8); font-size:0.8rem;">
+                <div style="margin-top:24px; padding:12px; background:rgba(255,179,0,0.1); border:1px dashed rgba(255,179,0,0.3); border-radius:8px; color:rgba(255,179,0,0.8); font-size:0.8rem; margin-bottom: 24px;">
                     提示：如果是「今海醫療科技」等靜態股票，系統會自動將前收價同步為新價位，以維持價格穩定。
+                </div>
+
+                <div style="background:#1a191d; border:1px solid #333; border-radius:8px; padding:16px;">
+                    <h4 style="color:white; margin:0 0 10px 0; font-size:1.05rem; display:flex; align-items:center; gap:8px;">
+                        <i class="fa-solid fa-circle-check" style="color:#4db6ac;"></i> 模擬交易成交設定
+                    </h4>
+                    <p style="color:var(--text-secondary); font-size:0.88rem; margin-bottom:16px; line-height:1.45;">
+                        開啟後委託將正常撮合成交；關閉後委託將保持「委託傳送中」狀態，便於擷取委託成功的畫面。
+                    </p>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="color:white; font-size:0.95rem; font-weight:600;">下單後要不要成交</span>
+                        <div style="display:flex; gap:8px;">
+                            <button id="toggle-match-yes" style="background: ${state.shouldMatchOrders === true || state.shouldMatchOrders === undefined ? '#4db6ac' : '#333'}; color: ${state.shouldMatchOrders === true || state.shouldMatchOrders === undefined ? 'white' : '#888'}; border:none; padding:8px 18px; border-radius:6px; font-size:0.95rem; font-weight:700; cursor:pointer;" onclick="window.setOrderMatching(true)">要成交</button>
+                            <button id="toggle-match-no" style="background: ${state.shouldMatchOrders === false ? '#4db6ac' : '#333'}; color: ${state.shouldMatchOrders === false ? 'white' : '#888'}; border:none; padding:8px 18px; border-radius:6px; font-size:0.95rem; font-weight:700; cursor:pointer;" onclick="window.setOrderMatching(false)">不成交 (委託中)</button>
+                            <button id="toggle-match-failed" style="background: ${state.shouldMatchOrders === 'failed' ? '#4db6ac' : '#333'}; color: ${state.shouldMatchOrders === 'failed' ? 'white' : '#888'}; border:none; padding:8px 18px; border-radius:6px; font-size:0.95rem; font-weight:700; cursor:pointer;" onclick="window.setOrderMatching('failed')">委託失敗</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
@@ -2284,6 +2328,7 @@ function getPortfolioTabContent() {
                     if (o.status === 'pending') { statusTop = '委託'; statusBottom = '成功'; }
                     else if (o.status === 'pending-disposition') { statusTop = '分盤'; statusBottom = '委託'; }
                     else if (o.status === 'executed') { statusTop = '完全'; statusBottom = '成交'; }
+                    else if (o.status === 'failed') { statusTop = '委託'; statusBottom = '失敗'; }
                     else { statusTop = '刪單'; statusBottom = '成功'; }
 
                     let sideColor = o.side === 'buy' ? '#e53935' : '#1e88e5';
@@ -3504,6 +3549,9 @@ function checkTriggers() {
 }
 
 function checkPendingOrders() {
+    if (state.shouldMatchOrders === false || state.shouldMatchOrders === 'failed') {
+        return false;
+    }
     let triggered = false;
     const now = Date.now();
 
@@ -3752,6 +3800,7 @@ function saveState() {
         history: state.history, triggers: state.triggers, assetHistory: state.assetHistory,
         watchlist: state.watchlist, isLightMode: state.isLightMode, colorMode: state.colorMode,
         alerts: state.alerts, feeDiscount: state.feeDiscount,
+        shouldMatchOrders: state.shouldMatchOrders,
         savedDate: new Date().toDateString()
     };
     localStorage.setItem('stockState_' + window.currentAccountId, JSON.stringify(saveData));
@@ -3776,6 +3825,7 @@ function loadState() {
             if (parsed.watchlist) state.watchlist = parsed.watchlist;
             if (parsed.alerts) state.alerts = parsed.alerts;
             if (parsed.feeDiscount !== undefined) state.feeDiscount = parsed.feeDiscount;
+            if (parsed.shouldMatchOrders !== undefined) state.shouldMatchOrders = parsed.shouldMatchOrders;
 
             if (parsed.savedDate && parsed.savedDate !== new Date().toDateString()) {
                 state.todayTrades = new Set();
