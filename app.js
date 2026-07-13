@@ -306,6 +306,15 @@ window.setPriceFluctuations = function (enabled) {
     showToast(enabled ? '✅ 已開啟股票價格自動變動' : '📴 已關閉股票價格自動變動，價格將靜止');
 };
 
+window.resetCurrentAccountTrades = function () {
+    if (confirm("確定要刪除此帳號內的所有交易紀錄並還原帳號嗎？")) {
+        resetStateInMemory();
+        saveState();
+        if (state.currentPage === 'portfolio') renderPage('portfolio', { keepScroll: true });
+        showToast("已成功刪除此帳號的所有交易紀錄！");
+    }
+};
+
 // --- Formatters & UI Helpers ---
 const formatNumber = (num, toFixed = 2) => {
     if (num === null || num === undefined || Number.isNaN(Number(num))) return (0).toFixed(toFixed);
@@ -2295,6 +2304,19 @@ function getPortfolioTabContent() {
                             <button id="toggle-price-fluct-yes" style="background: ${state.enablePriceFluctuations === true || state.enablePriceFluctuations === undefined ? 'var(--accent-blue)' : '#333'}; color: ${state.enablePriceFluctuations === true || state.enablePriceFluctuations === undefined ? 'white' : '#888'}; border:none; padding:8px 18px; border-radius:6px; font-size:0.95rem; font-weight:700; cursor:pointer;" onclick="window.setPriceFluctuations(true)">開啟</button>
                             <button id="toggle-price-fluct-no" style="background: ${state.enablePriceFluctuations === false ? 'var(--accent-blue)' : '#333'}; color: ${state.enablePriceFluctuations === false ? 'white' : '#888'}; border:none; padding:8px 18px; border-radius:6px; font-size:0.95rem; font-weight:700; cursor:pointer;" onclick="window.setPriceFluctuations(false)">關閉</button>
                         </div>
+                    </div>
+                </div>
+
+                <div style="background:#1a191d; border:1px solid #333; border-radius:8px; padding:16px; margin-top:16px;">
+                    <h4 style="color:#ff5252; margin:0 0 10px 0; font-size:1.05rem; display:flex; align-items:center; gap:8px;">
+                        <i class="fa-solid fa-trash-can" style="color:#ff5252;"></i> 還原此帳號
+                    </h4>
+                    <p style="color:var(--text-secondary); font-size:0.88rem; margin-bottom:16px; line-height:1.45;">
+                        此操作將會刪除目前帳號內的所有交易紀錄、委託單、損益以及重設可用餘額為一千萬元。
+                    </p>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="color:#ff5252; font-size:0.95rem; font-weight:600;">清除所有資料</span>
+                        <button style="background: #ff5252; color: white; border:none; padding:8px 18px; border-radius:6px; font-size:0.95rem; font-weight:700; cursor:pointer;" onclick="window.resetCurrentAccountTrades()">還原帳號</button>
                     </div>
                 </div>
             </div>
