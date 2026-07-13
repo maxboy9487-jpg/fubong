@@ -1977,30 +1977,30 @@ function renderPortfolioPage() {
     const accountTypeLabel = (currentAccount && currentAccount.type === 'HK') ? '海外股' : '台股';
 
     let tabsHtml = ['trade', 'orders', 'history', 'temp', 'other', 'long-term'].map(tab => {
-        const labels = { trade: '下單', orders: '委成回', history: '損益', temp: '暫存匣', other: '其他', 'long-term': '長...' };
+        const labels = { trade: '下單', orders: '委成回', history: '損益', temp: '暫存匣', other: '更多帳務', 'long-term': '長...' };
         const isActive = window.portfolioTab === tab;
         return `
-            <div id="portfolio-tab-${tab}" style="position:relative; cursor:pointer; font-weight: ${isActive ? 'bold' : 'normal'}; color: ${isActive ? '#ffffff' : '#888888'}; font-size:1.15rem; padding-bottom: 8px;" onclick="window.switchPortfolioTab('${tab}')">
+            <div id="portfolio-tab-${tab}" style="position:relative; cursor:pointer; font-weight: ${isActive ? 'bold' : 'normal'}; color: ${isActive ? '#ffffff' : '#8b94a0'}; font-size:1.15rem; padding-bottom: 8px;" onclick="window.switchPortfolioTab('${tab}')">
                 ${labels[tab]}
                 <div id="portfolio-tab-line-${tab}" style="position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:100%; height:3px; background-color: ${isActive ? '#ffffff' : 'transparent'}; border-radius:3px;"></div>
             </div>`;
     }).join('');
 
     let topHtml = `
-        <div style="background-color: #0d0d0d; color: #333; margin: 0; padding: 0;">
+        <div style="background-color: #151c26; color: #333; margin: 0; padding: 0;">
           <div style="display:flex; align-items:center; gap: 8px; margin-bottom: 16px; padding: 12px 14px 0 14px;">
-            <div style="background:#2a2a2a; border-radius: 8px; width: 44px; height: 38px; display:flex; justify-content:center; align-items:center; cursor:pointer;" onclick="renderPage('home')">
+            <div style="background:#232a35; border-radius: 8px; width: 44px; height: 38px; display:flex; justify-content:center; align-items:center; cursor:pointer;" onclick="renderPage('home')">
                 <i class="fa-solid fa-arrow-left" style="font-size:1.2rem; color:#dddddd;"></i>
             </div>
-            <div style="background:#2a2a2a; border-radius: 8px; height: 38px; padding: 0 12px; display:flex; align-items:center; gap: 8px; cursor:pointer;" onclick="window.renderAccountSelectionOverlay()">
+            <div style="background:#232a35; border-radius: 8px; height: 38px; padding: 0 12px; display:flex; align-items:center; gap: 8px; cursor:pointer;" onclick="window.renderAccountSelectionOverlay()">
                 <span style="font-size:1.05rem; font-weight:500; color:#dddddd;">${accountTypeLabel}</span>
                 <i class="fa-solid fa-chevron-down" style="font-size:0.85rem; color:#aaaaaa;"></i>
             </div>
-            <div style="background:#2a2a2a; border-radius: 8px; height: 38px; padding: 0 12px; display:flex; align-items:center; flex: 1; cursor:pointer;" onclick="window.renderAccountSelectionOverlay()">
+            <div style="background:#232a35; border-radius: 8px; height: 38px; padding: 0 12px; display:flex; align-items:center; flex: 1; cursor:pointer;" onclick="window.renderAccountSelectionOverlay()">
                 <span style="font-size:1.05rem; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#dddddd;">${state.currentBranch}</span>
             </div>
           </div>
-          <div style="display:flex; overflow-x:auto; background:#0d0d0d; align-items:center; gap: 20px; padding: 0 16px; border-bottom: 1px solid #2a2a2a;">
+          <div style="display:flex; overflow-x:auto; background:#151c26; align-items:center; gap: 20px; padding: 0 16px; border-bottom: 1px solid #232d3c;">
              ${tabsHtml}
           </div>
         </div>
@@ -2379,7 +2379,7 @@ function getPortfolioTabContent() {
                     else if (o.status === 'failed') { statusTop = '委託'; statusBottom = '失敗'; }
                     else { statusTop = '刪單'; statusBottom = '成功'; }
 
-                    let sideColor = o.side === 'buy' ? '#ff3b30' : '#00b06b';
+                    let sideColor = o.side === 'buy' ? '#CF5561' : '#00b06b';
                     let execShares = o.status === 'executed' ? o.shares : 0;
                     let execAvgPrice = o.execPrice ? o.execPrice : 0;
 
@@ -2416,8 +2416,8 @@ function getPortfolioTabContent() {
                                 </div>
                                 <div style="flex:0.9; display:flex; align-items:center; justify-content:flex-end; gap:8px; padding-right:8px;">
                                     <div style="display:flex; flex-direction:column; align-items:flex-end; justify-content:center;">
-                                        <div style="font-size:0.88rem; color:#fff; font-weight:600; line-height:1.15;">${statusTop}</div>
-                                        <div style="font-size:0.88rem; color:#fff; font-weight:600; line-height:1.15;">${statusBottom}</div>
+                                        <div style="font-size:0.88rem; color:#fff; font-weight:${o.status === 'executed' ? 'normal' : '600'}; line-height:1.15;">${statusTop}</div>
+                                        <div style="font-size:0.88rem; color:#fff; font-weight:${o.status === 'executed' ? 'normal' : '600'}; line-height:1.15;">${statusBottom}</div>
                                     </div>
                                     <div style="display:flex; align-items:center; justify-content:center; width:12px; flex-shrink:0;">
                                         <i class="fa-solid ${chevronClass}" style="font-size:0.65rem; color:#fff;"></i>
@@ -2468,7 +2468,7 @@ function getPortfolioTabContent() {
             } else {
                 state.history.slice().reverse().forEach(h => {
                     let tradePrice = h.price || h.sellPrice || h.buyAvgPrice || 0;
-                    let sideColor = h.type === 'buy' ? '#ff3b30' : '#00b06b';
+                    let sideColor = h.type === 'buy' ? '#CF5561' : '#00b06b';
 
                     const stockH = state.marketData.find(s => s.symbol === h.symbol);
                     let isHKLine = stockH && stockH.isHK;
