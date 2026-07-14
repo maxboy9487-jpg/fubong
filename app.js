@@ -1976,8 +1976,8 @@ function renderPortfolioPage() {
     const currentAccount = ACCOUNTS.find(a => a.id === window.currentAccountId) || ACCOUNTS[0];
     const accountTypeLabel = (currentAccount && currentAccount.type === 'HK') ? '海外股' : '台股';
 
-    let tabsHtml = ['trade', 'orders', 'history', 'temp', 'other', 'long-term'].map(tab => {
-        const labels = { trade: '下單', orders: '委成回', history: '損益', temp: '暫存匣', other: '更多帳務', 'long-term': '長...' };
+    let tabsHtml = ['trade', 'orders', 'history', 'other', 'temp'].map(tab => {
+        const labels = { trade: '下單', orders: '委成回', history: '損益', other: '更多帳務', temp: '暫存匣' };
         const isActive = window.portfolioTab === tab;
         return `
             <div id="portfolio-tab-${tab}" style="position:relative; cursor:pointer; font-weight: ${isActive ? 'bold' : 'normal'}; color: ${isActive ? '#ffffff' : '#8b94a0'}; font-size:1.15rem; padding-bottom: 8px;" onclick="window.switchPortfolioTab('${tab}')">
@@ -2326,7 +2326,7 @@ function getPortfolioTabContent() {
         if (!window.ordersSubTab) window.ordersSubTab = 'orders';
 
         let ordersHtml = `
-            <div style="background-color: #0d0d0d; min-height: 100vh; color: #333; padding: 12px 16px;">
+            <div style="background-color: #0f1116; min-height: 100vh; color: #333; padding: 12px 16px;">
                 <!-- Pill group -->
                 <div style="display:flex; background-color: #1a1a1a; border-radius: 6px; padding: 3px; margin-bottom: 10px;">
                     <div style="flex:1; text-align:center; padding: 5px 0; border-radius: 4px; cursor:pointer; font-weight:bold; font-size:0.88rem; transition: all 0.2s; ${window.ordersSubTab === 'orders' ? 'background-color: #0086bd; color: white;' : 'color: #aaa;'}" onclick="window.ordersSubTab='orders'; window.switchPortfolioTab('orders', true);">委託回報</div>
@@ -2334,28 +2334,41 @@ function getPortfolioTabContent() {
                 </div>
                 
                 <!-- Filter Bar -->
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; color: #0086bd; font-weight: bold; font-size: 0.88rem;">
-                    <div style="display:flex; align-items:center; gap: 6px;">
-                        <span>批次刪單</span>
-                        <i class="fa-regular fa-square-check" style="color: #0086bd; font-size:1.05rem; cursor:pointer;" onclick="state.orders=[]; window.switchPortfolioTab('orders', true); showToast('已全刪未成交委託');"></i>
-                        <i class="fa-solid fa-filter" style="font-size: 0.95rem; color: #333; cursor:pointer;"></i>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; color: #0e97c9; font-weight: bold; font-size: 0.88rem;">
+                    <div style="display:flex; align-items:center;">
+                        <span style="color: #0e97c9;">批次刪單</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e97c9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; flex-shrink:0; margin-left: 4px;" onclick="state.orders=[]; window.switchPortfolioTab('orders', true); showToast('已全刪未成交委託');">
+                            <!-- Back square border -->
+                            <path d="M8 20h9a3 3 0 0 0 3-3V8" />
+                            <!-- Front square -->
+                            <rect x="3" y="3" width="13" height="13" rx="3" />
+                            <!-- Checkmark -->
+                            <path d="M6.5 9.5l2.5 2.5 4.5-4.5" />
+                        </svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; flex-shrink:0; margin-left: 12px;">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                        </svg>
                     </div>
-                    <div style="display:flex; align-items:center; gap: 14px; color: #333;">
+                    <div style="display:flex; align-items:center; gap: 14px; color: #ffffff;">
                         <i class="fa-solid fa-rotate" style="font-size: 0.95rem; cursor:pointer;" onclick="window.switchPortfolioTab('orders', true)"></i>
-                        <i class="fa-solid fa-ellipsis" style="font-size: 1.05rem; cursor:pointer;"></i>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; flex-shrink:0;">
+                            <circle cx="12" cy="12" r="1.2" fill="#ffffff" />
+                            <circle cx="19" cy="12" r="1.2" fill="#ffffff" />
+                            <circle cx="5" cy="12" r="1.2" fill="#ffffff" />
+                        </svg>
                     </div>
                 </div>
                 
                 <!-- List Header -->
                 ${window.ordersSubTab === 'orders' ? `
-                <div style="display:flex; align-items:center; color: #8a8a8f; font-size: 0.82rem; font-weight: 500; border-bottom: 1px solid #222; padding-bottom: 6px; margin-bottom: 6px;">
+                <div style="display:flex; align-items:center; color: #ffffff; font-size: 0.82rem; font-weight: 500; padding-bottom: 6px; margin-bottom: 6px;">
                     <div style="flex:1.6; text-align:left; padding-left: 8px;">商品/類別</div>
                     <div style="flex:1.1; text-align:right; padding-right: 12px;">委量/<br>已成</div>
                     <div style="flex:1.2; text-align:right; padding-right: 12px;">委價/<br>成交均價</div>
                     <div style="flex:0.9; text-align:right; padding-right: 28px;">狀態</div>
                 </div>
                 ` : `
-                <div style="display:flex; align-items:center; color: #8a8a8f; font-size: 0.82rem; font-weight: 500; border-bottom: 1px solid #222; padding-bottom: 6px; margin-bottom: 6px;">
+                <div style="display:flex; align-items:center; color: #ffffff; font-size: 0.82rem; font-weight: 500; padding-bottom: 6px; margin-bottom: 6px;">
                     <div style="flex:1.6; text-align:left; padding-left: 8px;">商品</div>
                     <div style="flex:1.1; text-align:center;">類別</div>
                     <div style="flex:1.2; text-align:right; padding-right: 28px;">價格/數量</div>
@@ -2425,34 +2438,34 @@ function getPortfolioTabContent() {
                                 </div>
                             </div>
                             ${isExpanded ? `
-                            <div style="background-color: #181818; border-radius: 8px; padding: 8px 12px; margin: 0px 8px 10px 8px; font-size: 0.82rem; color: #ccc; display: flex; flex-direction: column; gap: 5px;">
+                            <div style="background-color: #232a35; border-radius: 8px; padding: 12px 16px; margin: 4px 12px 12px 12px; font-size: 0.88rem; display: flex; flex-direction: column; gap: 8px;">
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="color:#666;">觸價價格</span>
-                                    <span style="font-family:var(--font-mono); font-weight:500;">-</span>
+                                    <span style="color:#e1e2e6;">觸價價格</span>
+                                    <span style="color:#ffffff;">-</span>
                                 </div>
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="color:#666;">委託時間</span>
-                                    <span style="font-family:var(--font-mono); font-weight:500;">${o.time || '-'}</span>
+                                    <span style="color:#e1e2e6;">委託時間</span>
+                                    <span style="color:#ffffff;">${o.time || '-'}</span>
                                 </div>
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="color:#666;">取消</span>
-                                    <span style="font-family:var(--font-mono); font-weight:500;">${o.status === 'canceled' ? formatNumber(o.shares, 0) + '股' : '-'}</span>
+                                    <span style="color:#e1e2e6;">取消</span>
+                                    <span style="color:#ffffff;">${o.status === 'canceled' ? formatNumber(o.shares, 0) + '股' : '-'}</span>
                                 </div>
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="color:#666;">狀態</span>
-                                    <span style="font-weight:500;">${statusTop}${statusBottom}</span>
+                                    <span style="color:#e1e2e6;">狀態</span>
+                                    <span style="color:#ffffff;">${statusTop}${statusBottom}</span>
                                 </div>
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="color:#666;">有效期限</span>
-                                    <span style="font-family:var(--font-mono); font-weight:500;">-</span>
+                                    <span style="color:#e1e2e6;">有效期限</span>
+                                    <span style="color:#ffffff;">-</span>
                                 </div>
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="color:#666;">委託書號</span>
-                                    <span style="font-family:var(--font-mono); font-weight:500;">${o.docNo || '-'}</span>
+                                    <span style="color:#e1e2e6;">委託書號</span>
+                                    <span style="color:#ffffff;">${o.docNo || '-'}</span>
                                 </div>
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="color:#666;">原因</span>
-                                    <span style="font-weight:500;"></span>
+                                    <span style="color:#e1e2e6;">原因</span>
+                                    <span style="color:#ffffff;">-</span>
                                 </div>
                             </div>
                             ` : ''}
@@ -2585,76 +2598,81 @@ function getPortfolioTabContent() {
 
             // Filter Bar
             contentHtml += `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; color: #333; font-weight: bold;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; color: #ffffff; font-weight: bold;">
                     <div style="display:flex; align-items:center; gap: 4px; cursor:pointer; font-size:1.05rem;">
                         <span>全部市場</span>
-                        <i class="fa-solid fa-chevron-down" style="font-size:0.85rem;"></i>
+                        <i class="fa-solid fa-chevron-down" style="font-size:0.85rem; color: #ffffff;"></i>
                     </div>
                     <div style="cursor:pointer;" onclick="window.switchPortfolioTab('history', true)">
-                        <i class="fa-solid fa-rotate" style="font-size: 1.1rem;"></i>
+                        <i class="fa-solid fa-rotate" style="font-size: 1.1rem; color: #ffffff;"></i>
                     </div>
                 </div>
 
                 <!-- Summary Card -->
-                <div style="background-color: #181818; border-radius: 16px; padding: 16px; margin-bottom: 16px; display:flex; flex-direction:column; gap: 10px; position:relative;">
+                <div style="background-color: #232a35; border-radius: 16px; padding: 16px; margin-bottom: 16px; display:flex; flex-direction:column; gap: 10px; position:relative;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight: 600; color: #111; font-size: 1.05rem;">總預估現值(約當台幣)</span>
-                        <span style="font-weight: normal; color: #111; font-size: 1.15rem; font-family:var(--font-mono);">${formatNumber(totalEstValueTwd)}</span>
+                        <span style="font-weight: 600; color: #ffffff; font-size: 0.92rem; white-space: nowrap;">總預估現值(約當台幣)</span>
+                        <span style="font-weight: normal; color: #ffffff; font-size: 1.05rem; font-family:var(--font-mono);">${formatNumber(totalEstValueTwd)}</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.92rem;">
-                        <span style="color: #666; font-weight: normal;">總損益試算約當台幣</span>
+                        <span style="color: #777b82; font-weight: normal; white-space: nowrap;">總損益試算約當台幣</span>
                         <span style="font-weight: normal; color: ${twdPnlColor}; font-family:var(--font-mono); font-size: 0.98rem;">${totalPnlTwd >= 0 ? '+' : ''}${formatNumber(totalPnlTwd)}(${totalPnlTwd >= 0 ? '+' : ''}${totalPnlPctTwd.toFixed(2)}%)</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.92rem;">
-                        <span style="color: #666; font-weight: normal;">總付出成本約當台幣</span>
-                        <span style="font-weight: normal; color: #111; font-family:var(--font-mono); font-size: 0.98rem;">${formatNumber(totalCostTwd)}</span>
+                        <span style="color: #777b82; font-weight: normal; white-space: nowrap;">總付出成本約當台幣</span>
+                        <span style="font-weight: normal; color: #ffffff; font-family:var(--font-mono); font-size: 0.98rem;">${formatNumber(totalCostTwd)}</span>
                     </div>
             `;
 
             if (window.pnlCardExpanded) {
                 contentHtml += `
-                    <div style="border-bottom: 1px solid #ddd; margin: 4px 0;"></div>
+                    <div style="border-bottom: 1px solid #444; margin: 4px 0;"></div>
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.92rem;">
-                        <span style="color: #666; font-weight: normal;">總預估現值(港幣)</span>
-                        <span style="font-weight: normal; color: #111; font-family:var(--font-mono); font-size: 0.98rem;">${formatNumber(totalEstValueHkd)}</span>
+                        <span style="color: #777b82; font-weight: normal; white-space: nowrap;">總預估現值(港幣)</span>
+                        <span style="font-weight: normal; color: #ffffff; font-family:var(--font-mono); font-size: 0.98rem;">${formatNumber(totalEstValueHkd)}</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.92rem;">
-                        <span style="color: #666; font-weight: normal;">總損益試算港幣</span>
+                        <span style="color: #777b82; font-weight: normal; white-space: nowrap;">總損益試算港幣</span>
                         <span style="font-weight: normal; color: ${hkdPnlColor}; font-family:var(--font-mono); font-size: 0.98rem;">${totalPnlHkd >= 0 ? '+' : ''}${formatNumber(totalPnlHkd)}(${totalPnlHkd >= 0 ? '+' : ''}${totalPnlPctHkd.toFixed(2)}%)</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.92rem;">
-                        <span style="color: #666; font-weight: normal;">總付出成本港幣</span>
-                        <span style="font-weight: normal; color: #111; font-family:var(--font-mono); font-size: 0.98rem;">${formatNumber(totalCostHkd)}</span>
+                        <span style="color: #777b82; font-weight: normal; white-space: nowrap;">總付出成本港幣</span>
+                        <span style="font-weight: normal; color: #ffffff; font-family:var(--font-mono); font-size: 0.98rem;">${formatNumber(totalCostHkd)}</span>
                     </div>
                 `;
             }
 
             contentHtml += `
                     <div style="display:flex; justify-content:center; align-items:center; margin-top: 4px; cursor:pointer;" onclick="window.pnlCardExpanded = !window.pnlCardExpanded; window.switchPortfolioTab('history', true);">
-                        <i class="fa-solid ${window.pnlCardExpanded ? 'fa-chevron-up' : 'fa-chevron-down'}" style="font-size:1rem; color:#666;"></i>
+                        <i class="fa-solid ${window.pnlCardExpanded ? 'fa-chevron-up' : 'fa-chevron-down'}" style="font-size:1rem; color:#777b82;"></i>
                     </div>
                 </div>
- 
+
                 <!-- Secondary Header Icons -->
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; color: #888;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; color: #ffffff;">
                     <div>
-                        <i class="fa-solid fa-filter" style="font-size: 1.1rem; cursor:pointer;"></i>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; flex-shrink:0;">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                        </svg>
                     </div>
                     <div style="display:flex; align-items:center; gap: 16px;">
-                        <i class="fa-solid fa-circle-info" style="font-size: 1.1rem; cursor:pointer;"></i>
-                        <i class="fa-solid fa-ellipsis" style="font-size: 1.1rem; cursor:pointer;"></i>
+                        <i class="fa-solid fa-circle-info" style="font-size: 1.1rem; color: #ffffff; cursor:pointer;"></i>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; flex-shrink:0;">
+                            <circle cx="12" cy="12" r="1.2" fill="#ffffff" />
+                            <circle cx="19" cy="12" r="1.2" fill="#ffffff" />
+                            <circle cx="5" cy="12" r="1.2" fill="#ffffff" />
+                        </svg>
                     </div>
                 </div>
- 
+
                 <!-- List Header -->
-                <div style="display:flex; align-items:center; color: #666; font-size: 0.88rem; font-weight: normal; padding-bottom: 6px; margin-bottom: 6px; text-align: center;">
-                    <div style="width: 26%; text-align:left; flex-shrink: 0; padding-left: 8px;">商品</div>
-                    <div style="width: 14%; text-align:center; flex-shrink: 0;">今餘</div>
-                    <div style="width: 18%; text-align:center; flex-shrink: 0;">可賣</div>
-                    <div style="width: 23%; text-align:right; flex-shrink: 0;">損益</div>
-                    <div style="width: 19%; text-align:right; flex-shrink: 0; padding-right: 4px;">損益率</div>
+                <div style="display:flex; align-items:center; color: #ffffff; font-size: 0.88rem; font-weight: normal; padding-bottom: 2px; margin-bottom: 2px; text-align: center;">
+                    <div style="width: 35%; text-align:left; flex-shrink: 0; padding-left: 8px;">商品</div>
+                    <div style="width: 20%; text-align:right; flex-shrink: 0;">今餘</div>
+                    <div style="width: 20%; text-align:right; flex-shrink: 0;">可賣</div>
+                    <div style="width: 25%; text-align:right; flex-shrink: 0; padding-right: 8px;">損益</div>
                 </div>
- 
+
                 <div id="unrealized-list-container">
             `;
 
@@ -2676,32 +2694,28 @@ function getPortfolioTabContent() {
                     let displaySymbol = pos.symbol.startsWith('00') ? pos.symbol.slice(1) : pos.symbol;
 
                     contentHtml += `
-                        <div style="display:flex; align-items:center; border-bottom: 1px solid #eee; padding: 9px 0; font-size: 0.9rem;">
+                        <div style="display:flex; align-items:center; padding: 4px 0 8px 0; border-bottom: 1px solid #1c222b; font-size: 0.9rem;">
                             <!-- Stock Info -->
-                            <div style="width: 26%; text-align:left; flex-shrink: 0; display:flex; flex-direction:column; gap: 4px; min-width: 0; padding-left: 8px;">
-                                <span style="font-weight: bold; color: #000000; font-size: 1.02rem; line-height: 1.1; display: inline-block; max-width: 4em; word-break: break-all; white-space: normal;">
+                            <div style="width: 35%; text-align:left; flex-shrink: 0; display:flex; flex-direction:column; gap: 2px; min-width: 0; padding-left: 8px;">
+                                <span style="font-weight: normal; color: #ffffff; font-size: 1.02rem; line-height: 1.1; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                     ${pos.name}
                                 </span>
-                                <div style="display:flex; align-items:center; white-space: nowrap; margin-top: 4px;">
+                                <div style="display:flex; align-items:center; white-space: nowrap; margin-top: 2px;">
                                     ${isHKPos ? `<span style="background-color: #5c3ec2; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">HK</span>` : `<span style="background-color: #e67e22; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">TW</span>`}
-                                    <span style="color: #4b5563; font-size: 0.85rem; font-weight: 500; font-family:var(--font-mono);">${displaySymbol}</span>
+                                    <span style="color: #ffffff; font-size: 0.85rem; font-weight: 500; font-family:var(--font-mono);">${displaySymbol}</span>
                                 </div>
                             </div>
                             <!-- Shares (今餘) -->
-                            <div style="width: 14%; text-align:center; flex-shrink: 0; font-family:var(--font-mono); color: #222; white-space: nowrap; font-size: 0.9rem; font-weight: normal;">
+                            <div style="width: 20%; text-align:right; flex-shrink: 0; font-family:var(--font-mono); color: #ffffff; white-space: nowrap; font-size: 0.9rem; font-weight: normal;">
                                 ${formatNumber(pos.shares, 0)}
                             </div>
                             <!-- Available (可賣) -->
-                            <div style="width: 18%; text-align:center; flex-shrink: 0; font-family:var(--font-mono); color: #222; white-space: nowrap; font-size: 0.9rem; font-weight: normal;">
+                            <div style="width: 20%; text-align:right; flex-shrink: 0; font-family:var(--font-mono); color: #ffffff; white-space: nowrap; font-size: 0.9rem; font-weight: normal;">
                                 ${formatNumber(pos.shares, 0)}
                             </div>
                             <!-- PnL (損益) -->
-                            <div style="width: 23%; text-align:right; flex-shrink: 0; font-family:var(--font-mono); font-weight: normal; color: ${pnlColor}; white-space: nowrap; font-size: 0.9rem;">
+                            <div style="width: 25%; text-align:right; flex-shrink: 0; padding-right: 8px; font-family:var(--font-mono); font-weight: normal; color: ${pnlColor}; white-space: nowrap; font-size: 0.9rem;">
                                 ${pnlLocal >= 0 ? '+' : ''}${formatNumber(pnlLocal)}
-                            </div>
-                            <!-- PnL % (損益率) -->
-                            <div style="width: 19%; text-align:right; flex-shrink: 0; padding-right: 4px; font-family:var(--font-mono); font-weight: normal; color: ${pnlColor}; white-space: nowrap; font-size: 0.9rem;">
-                                ${pnlLocal >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%
                             </div>
                         </div>
                     `;
