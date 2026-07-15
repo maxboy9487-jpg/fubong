@@ -39,8 +39,11 @@ function getOrGenerateAccount(type, branch) {
 }
 
 const DEFAULT_ACCOUNTS = [
-    getOrGenerateAccount('TW', '松江'),
-    getOrGenerateAccount('HK', '營業部')
+    { type: 'HK', branch: '營業部', id: '7294689', name: '陳冠宇' },
+    { type: 'HK', branch: '樹林', id: '9482506', name: '林雅婷' },
+    { type: 'HK', branch: '三重', id: '3587201', name: '黃建豪' },
+    { type: 'HK', branch: '南港', id: '3893919', name: '林怡君' },
+    { type: 'HK', branch: '永康', id: '8451039', name: '李建宇' }
 ];
 
 let customAccounts = JSON.parse(localStorage.getItem('stockCustomAccounts') || '[]');
@@ -50,7 +53,7 @@ window.currentAccountId = localStorage.getItem('stockCurrentAccount');
 
 const getAccountDisplayName = (account) => {
     if (!account) return '';
-    const prefix = account.type === 'HK' ? '復' : '證';
+    const prefix = account.type === 'HK' ? '複' : '證';
     const nameStr = account.name || '名稱';
     return `${prefix}-${account.branch}${account.id}-${nameStr}`;
 };
