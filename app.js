@@ -306,6 +306,7 @@ window.setPriceFluctuations = function (enabled) {
     state.enablePriceFluctuations = enabled;
     saveState();
     if (state.currentPage === 'portfolio') renderPage('portfolio', { keepScroll: true });
+    if (state.currentPage === 'more') renderPage('more');
     showToast(enabled ? '✅ 已開啟股票價格自動變動' : '📴 已關閉股票價格自動變動，價格將靜止');
 };
 
@@ -3059,6 +3060,21 @@ function renderMorePage() {
                     </div>
                     <button class="btn btn-blue" style="margin-top:4px; height:44px; font-weight:bold; border-radius:8px;" onclick="window.moreChangeStockPrice()">改變</button>
                 </div>
+            </div>
+
+            <!-- 即時股價跳動設定 Section -->
+            <div class="card" style="margin-bottom: 24px; padding: 16px; background-color: #1a191d; border: 1px solid #333; border-radius: 12px;">
+                <h4 style="color:#26a69a; margin-bottom:16px; font-size:1.1rem; display:flex; align-items:center; gap:8px;">
+                    <i class="fa-solid fa-chart-line"></i> 即時報價設定
+                </h4>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:0.95rem; color:white; font-weight:600;">即時股價跳動</span>
+                    <div style="display:flex; gap:4px; background:#111; padding:4px; border-radius:8px; border:1px solid #333;">
+                        <button class="btn" style="padding:6px 16px; font-size:0.85rem; border:none; cursor:pointer; color:${state.enablePriceFluctuations !== false ? 'white' : '#888'}; background:${state.enablePriceFluctuations !== false ? 'var(--accent-blue)' : 'transparent'}; border-radius:6px; font-weight:bold; transition:all 0.2s;" onclick="window.setPriceFluctuations(true)">開啟</button>
+                        <button class="btn" style="padding:6px 16px; font-size:0.85rem; border:none; cursor:pointer; color:${state.enablePriceFluctuations === false ? 'white' : '#888'}; background:${state.enablePriceFluctuations === false ? 'var(--accent-blue)' : 'transparent'}; border-radius:6px; font-weight:bold; transition:all 0.2s;" onclick="window.setPriceFluctuations(false)">關閉</button>
+                    </div>
+                </div>
+                <p style="font-size:0.8rem; color:#888; margin-top:12px; margin-bottom:0; line-height:1.4;">開啟時模擬市場價格隨機跳動更新；關閉後股價將維持靜止，您依然可透過個股調整手動調整價格。</p>
             </div>
 
             <!-- Account Settings & Reset Section -->
