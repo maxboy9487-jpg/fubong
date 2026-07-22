@@ -2601,6 +2601,17 @@ window.parsedMarketData.push({
     isStatic: true, isHK: true 
 });
 
+window.parsedMarketData.push({ 
+    symbol: '00805', name: '新吉奧房車', price: 6.01, change: 0.00, prevClose: 6.01, 
+    open: 6.01, high: 6.01, low: 6.01, volume: 0, volumeStr: '0', turnoverAmount: '0', 
+    marketCap: '--', totalShares: '--', circulatingShares: '--', circulatingValue: '--',
+    peTTM: '--', peStatic: '--', pb: '--', peDynamic: '--',
+    turnoverRateStr: '--', bidRatio: '--', volumeRatio: '--', avgPriceStr: '6.01', amplitudeStr: '0.00%',
+    high52: 6.01, low52: 6.01, historyHigh: 6.01, historyLow: 6.01, lotSize: '2000股', lotSizeVal: 2000,
+    beta: 1.0, divYieldTTM: '--', divYieldLFY: '--', divYieldRateTTM: '--', divYieldRateLFY: '--',
+    isStatic: true, isHK: true 
+});
+
 
 
 
