@@ -83,7 +83,7 @@ const state = {
     orders: [],
     history: [],
     triggers: [],
-    watchlist: ['2330', '2454', '00326'],
+    watchlist: ['2330', '2454', '00326', '06162'],
     marketData: window.parsedMarketData || [],
     currentBranch: getAccountDisplayName(initialAccount),
     shouldMatchOrders: true
