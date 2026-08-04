@@ -2452,7 +2452,7 @@ function getPortfolioTabContent() {
                             <div style="background-color: #232a35; border-radius: 8px; padding: 12px 16px; margin: 4px 12px 12px 12px; font-size: 0.88rem; display: flex; flex-direction: column; gap: 8px;">
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <span style="color:#e1e2e6;">觸價價格</span>
-                                    <span style="color:#ffffff;">-</span>
+                                    <span style="color:#ffffff;">${o.status === 'executed' ? formatNumber(o.price, isHKLine ? 2 : 0) : '-'}</span>
                                 </div>
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <span style="color:#e1e2e6;">委託時間</span>
