@@ -372,6 +372,9 @@ window.showConfirmModal = (title, content, onConfirm, actionText = '確認', act
         onConfirm();
         modal.remove();
     };
+    modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+    };
 };
 
 window.toggleWatchlist = (e, symbol) => {
@@ -690,6 +693,12 @@ window.cancelOrder = (id) => {
 window.cancelTrigger = (id) => {
     let t = state.triggers.find(t => t.id === id);
     if (t && t.status === 'active') { t.status = 'canceled'; showToast('監控已中止', 'error'); if (state.currentPage === 'portfolio') renderPage('portfolio'); }
+};
+
+window.deleteHistory = (id) => {
+    state.history = state.history.filter(h => h.id !== id);
+    showToast('已刪除紀錄');
+    if (state.currentPage === 'portfolio') renderPage('portfolio');
 };
 
 // --- Initialization & Data generation ---
@@ -2346,6 +2355,7 @@ function getPortfolioTabContent() {
                 <!-- Filter Bar -->
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; color: #0e97c9; font-weight: bold; font-size: 0.88rem;">
                     <div style="display:flex; align-items:center;">
+                        ${window.ordersSubTab === 'orders' ? `
                         <span style="color: #0e97c9;">批次刪單</span>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e97c9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; flex-shrink:0; margin-left: 4px;" onclick="state.orders=[]; window.switchPortfolioTab('orders', true); showToast('已全刪未成交委託');">
                             <!-- Back square border -->
@@ -2355,6 +2365,13 @@ function getPortfolioTabContent() {
                             <!-- Checkmark -->
                             <path d="M6.5 9.5l2.5 2.5 4.5-4.5" />
                         </svg>
+                        ` : `
+                        <span style="color: #0e97c9;">刪除紀錄</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e97c9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; flex-shrink:0; margin-left: 4px;" onclick="if(confirm('確定要刪除所有成交紀錄嗎？')) { state.history=[]; window.switchPortfolioTab('orders', true); showToast('已刪除所有紀錄'); }">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        `}
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; flex-shrink:0; margin-left: 12px;">
                             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
                         </svg>
@@ -2391,7 +2408,27 @@ function getPortfolioTabContent() {
         if (window.ordersSubTab === 'orders') {
             if (!window.expandedOrders) window.expandedOrders = {};
             if (state.orders.length === 0) {
-                ordersHtml += '<div style="text-align:center; padding: 2.5rem; color: #888; font-weight:bold;">無委託紀錄</div>';
+                ordersHtml += `
+                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 4rem 1rem 2rem 1rem; text-align:center; animation: fadeIn 0.5s ease-out 1s both;">
+                        <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 16px;">
+                            <!-- Box Base (Isometric sides) -->
+                            <path d="M60 70 L30 55 L30 85 L60 100 Z" fill="#E2E8F0" />
+                            <path d="M60 70 L90 55 L90 85 L60 100 Z" fill="#CBD5E1" />
+                            <path d="M60 40 L30 55 L60 70 L90 55 Z" fill="#F1F5F9" />
+                            <!-- Box Inside Darkening -->
+                            <path d="M60 70 L40 60 L60 50 L80 60 Z" fill="#94A3B8" opacity="0.6" />
+                            <!-- Left flap -->
+                            <path d="M30 55 L15 45 L45 30 L60 40 Z" fill="#E2E8F0" />
+                            <!-- Right flap -->
+                            <path d="M90 55 L105 45 L75 30 L60 40 Z" fill="#CBD5E1" />
+                            <!-- Leaves -->
+                            <path d="M50 30 C50 30 45 25 48 20 C51 15 56 22 56 22 C56 22 58 28 53 29 Z" fill="#A7F3D0" />
+                            <path d="M70 45 C70 45 68 40 72 37 C76 34 78 40 78 40 C78 40 77 46 73 46 Z" fill="#6EE7B7" />
+                            <path d="M45 42 Q50 35 48 28" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="3 3" fill="none" />
+                        </svg>
+                        <div style="color: #b2b2b2; font-size: 1.05rem; font-weight: 500;">目前沒有委託單</div>
+                    </div>
+                `;
             } else {
                 state.orders.forEach(o => {
                     let isCancellable = (o.status === 'pending' || o.status === 'pending-disposition' || o.status === 'submitted');
@@ -2488,7 +2525,27 @@ function getPortfolioTabContent() {
             // Trades Tab
             if (!window.expandedTrades) window.expandedTrades = {};
             if (state.history.length === 0) {
-                ordersHtml += '<div style="text-align:center; padding: 2.5rem; color: #888; font-weight:bold;">尚無成交紀錄</div>';
+                ordersHtml += `
+                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 4rem 1rem 2rem 1rem; text-align:center; animation: fadeIn 0.5s ease-out 1s both;">
+                        <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 16px;">
+                            <!-- Box Base (Isometric sides) -->
+                            <path d="M60 70 L30 55 L30 85 L60 100 Z" fill="#E2E8F0" />
+                            <path d="M60 70 L90 55 L90 85 L60 100 Z" fill="#CBD5E1" />
+                            <path d="M60 40 L30 55 L60 70 L90 55 Z" fill="#F1F5F9" />
+                            <!-- Box Inside Darkening -->
+                            <path d="M60 70 L40 60 L60 50 L80 60 Z" fill="#94A3B8" opacity="0.6" />
+                            <!-- Left flap -->
+                            <path d="M30 55 L15 45 L45 30 L60 40 Z" fill="#E2E8F0" />
+                            <!-- Right flap -->
+                            <path d="M90 55 L105 45 L75 30 L60 40 Z" fill="#CBD5E1" />
+                            <!-- Leaves -->
+                            <path d="M50 30 C50 30 45 25 48 20 C51 15 56 22 56 22 C56 22 58 28 53 29 Z" fill="#A7F3D0" />
+                            <path d="M70 45 C70 45 68 40 72 37 C76 34 78 40 78 40 C78 40 77 46 73 46 Z" fill="#6EE7B7" />
+                            <path d="M45 42 Q50 35 48 28" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="3 3" fill="none" />
+                        </svg>
+                        <div style="color: #b2b2b2; font-size: 1.05rem; font-weight: 500;">目前查無相關資料</div>
+                    </div>
+                `;
             } else {
                 state.history.slice().reverse().forEach(h => {
                     let tradePrice = h.price || h.sellPrice || h.buyAvgPrice || 0;
@@ -2503,6 +2560,9 @@ function getPortfolioTabContent() {
                         <div style="display:flex; flex-direction:column; border-bottom: 1px solid #222;">
                             <div style="display:flex; align-items:stretch; padding: 9px 0; cursor:pointer;" onclick="window.toggleTradeExpand(${h.id})">
                                 <div style="flex:1.6; display:flex; align-items:center; gap:6px; text-align:left; padding-left:8px; min-width: 0;">
+                                    <div style="background-color: #555; color: white; width: 36px; padding: 8px 0; border-radius: 4px; font-weight: bold; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; flex-shrink:0; font-size: 0.8rem; margin-right: 4px;" onclick="event.stopPropagation(); deleteHistory(${h.id})">
+                                        <div>刪</div><div>除</div>
+                                    </div>
                                     <div style="display:flex; flex-direction:column; gap:3px; min-width: 0; justify-content:center;">
                                         <div style="font-weight:bold; font-size:0.9rem; color:#fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${h.name}</div>
                                         <div style="display:flex; align-items:center; gap:4px;">
@@ -3424,10 +3484,14 @@ function buildTradePage() {
                 </div>
                 ${warning ? `<div style="color:#ff5252; font-size:0.9rem; font-weight:600; margin-top:12px; text-align:right; animation: slideDown 0.2s;"><i class="fa-solid fa-triangle-exclamation"></i> ${warning}</div>` : ''}
             </div>
-            
-            <button class="btn btn-${actionColor}" id="trade-submit-btn" style="height: 56px; font-size: 1.2rem; margin-bottom: 24px; transition: transform 0.1s;" ${disabled ? 'disabled' : ''} onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform='scale(1)'">
-                ${actionText}
-            </button>
+            <div style="display:flex; gap:12px; margin-bottom: 24px;">
+                <button class="btn" style="flex:1; height: 56px; font-size: 1.1rem; border-radius: 8px; background: #333; color: #fff; transition: transform 0.1s;" onclick="renderPage('home')" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform='scale(1)'">
+                    退出
+                </button>
+                <button class="btn btn-${actionColor}" id="trade-submit-btn" style="flex:2.5; height: 56px; font-size: 1.2rem; transition: transform 0.1s;" ${disabled ? 'disabled' : ''} onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform='scale(1)'">
+                    ${actionText}
+                </button>
+            </div>
         `;
 
         container.querySelector('#trade-side-buy').onclick = () => { tradeState.side = 'buy'; renderForm(); };
