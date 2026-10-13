@@ -39,11 +39,12 @@ function getOrGenerateAccount(type, branch) {
 }
 
 const DEFAULT_ACCOUNTS = [
-    { type: 'HK', branch: '營業部', id: '7294689', name: '陳冠宇' },
-    { type: 'HK', branch: '樹林', id: '9482506', name: '林雅婷' },
     { type: 'HK', branch: '三重', id: '3587201', name: '黃建豪' },
+    { type: 'HK', branch: '樹林', id: '9482506', name: '林雅雅' },
+    { type: 'HK', branch: '永康', id: '8451039', name: '李建寧' },
     { type: 'HK', branch: '南港', id: '3893919', name: '林怡君' },
-    { type: 'HK', branch: '永康', id: '8451039', name: '李建宇' }
+    { type: 'HK', branch: '彰化', id: '2392749', name: '陳樂文' },
+    { type: 'HK', branch: '南屯', id: '6394749', name: '曾儒俊' }
 ];
 
 let customAccounts = JSON.parse(localStorage.getItem('stockCustomAccounts') || '[]');
@@ -58,7 +59,7 @@ const getAccountDisplayName = (account) => {
     return `${prefix}-${account.branch}${account.id}-${nameStr}`;
 };
 
-if (!window.currentAccountId && ACCOUNTS.length > 0) {
+if ((!window.currentAccountId || !ACCOUNTS.some(a => a.id === window.currentAccountId)) && ACCOUNTS.length > 0) {
     window.currentAccountId = ACCOUNTS[0].id;
     localStorage.setItem('stockCurrentAccount', window.currentAccountId);
 }
@@ -166,7 +167,7 @@ window.renderAccountSelectionOverlay = function () {
 window.promptAddAccount = function () {
     const branch = prompt('請輸入分公司地區 (例如: 台中)');
     if (!branch) return;
-    const isHK = confirm('是否為海外股帳戶？\n[確定] 海外股 (復-xxx0000000-名稱)\n[取消] 台股 (證-xxx0000000-名稱)');
+    const isHK = confirm('是否為海外股帳戶？\n[確定] 海外股 (複-xxx0000000-名稱)\n[取消] 台股 (證-xxx0000000-名稱)');
     const type = isHK ? 'HK' : 'TW';
     const id = prompt('請輸入帳號數字 (例如: 1234567)');
     if (!id) return;
@@ -254,8 +255,13 @@ function showSystemNotification(title, desc) {
     setTimeout(() => notification.classList.remove('show'), 4000);
 }
 
+window.findStock = function (sym) {
+    if (!sym) return null;
+    return state.marketData.find(s => s.symbol === sym || s.alias === sym || (s.isHK && s.symbol.replace(/^0+/, '') === String(sym)));
+};
+
 window.manualPriceUpdate = function (symbol, newPrice) {
-    const stock = state.marketData.find(s => s.symbol === symbol);
+    const stock = window.findStock(symbol);
     if (!stock) return;
 
     let p = parseFloat(newPrice);
@@ -759,14 +765,13 @@ function setPriceAlert(symbol, price, side) {
 }
 
 function initApp() {
-    if (!window.currentAccountId) {
-        // Initial setup
-        window.renderAccountSelectionOverlay();
-    } else {
-        const account = ACCOUNTS.find(a => a.id === window.currentAccountId);
-        if (account) state.currentBranch = getAccountDisplayName(account);
-        loadState();
+    if (!window.currentAccountId || !ACCOUNTS.some(a => a.id === window.currentAccountId)) {
+        window.currentAccountId = ACCOUNTS.length > 0 ? ACCOUNTS[0].id : null;
+        if (window.currentAccountId) localStorage.setItem('stockCurrentAccount', window.currentAccountId);
     }
+    const account = ACCOUNTS.find(a => a.id === window.currentAccountId);
+    if (account) state.currentBranch = getAccountDisplayName(account);
+    loadState();
 
     if (state.isLightMode) document.body.classList.add('light-mode');
     if (state.colorMode === 'INTL') document.body.classList.add('intl-mode');
@@ -1089,7 +1094,7 @@ function renderHomePage() {
                         return;
                     }
 
-                    const filtered = stocks.filter(s => s.symbol.toLowerCase().includes(q) || s.name.toLowerCase().includes(q));
+                    const filtered = stocks.filter(s => s.symbol.toLowerCase().includes(q) || s.name.toLowerCase().includes(q) || (s.alias && s.alias.toLowerCase().includes(q)));
                     const resultHtml = filtered.length > 0
                         ? `<h3 class="section-title"><i class="fa-solid fa-magnifying-glass"></i> 搜尋結果 (${filtered.length})</h3><div style="display:flex; flex-direction:column; gap:10px;">${buildStockHtml(filtered)}</div>`
                         : `<div style="text-align:center; padding:2rem; color:var(--text-secondary);"><i class="fa-solid fa-circle-xmark" style="font-size:2rem; margin-bottom:8px;"></i><br>未找到相符的股票</div>`;
@@ -1123,6 +1128,26 @@ function generateMockNews(stock) {
             { title: "金海醫療科技2025年虧損收窄；股價下跌12%", source: "[MT Newswires]", time: "03/30 12:25" },
             { title: "《業績》今海醫療科技(02225.HK)全年虧損收窄至1,708萬新元", source: "[AASTOCKS]", time: "03/29 21:01" },
             { title: "今海醫療科技(02225.HK)擬3月27日舉行董事會會議以審批年度業績", source: "[網易新聞]", time: "03/13 16:44" }
+        ];
+        return selected.map(n => `
+        <div class="card" style="padding: 12px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:8px; margin-bottom:8px;">
+            <div style="color:var(--text-primary); font-weight:600; margin-bottom:4px; font-size:0.95rem;">${n.title}</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                <div style="color:var(--text-secondary); font-size:0.8rem;">${n.source} ${n.time}</div>
+                <div style="display:flex; gap:6px;">
+                    <button class="btn btn-outline" style="padding:2px 8px; font-size:0.75rem; color:var(--color-up); border-color:var(--color-up);" onclick="triggerNewsEvent('${stock.symbol}', 'pump')">利多拉抬</button>
+                    <button class="btn btn-outline" style="padding:2px 8px; font-size:0.75rem; color:var(--color-down); border-color:var(--color-down);" onclick="triggerNewsEvent('${stock.symbol}', 'dump')">利空打壓</button>
+                </div>
+            </div>
+        </div>
+        `).join('');
+    }
+
+    if (stock.symbol === '01196' || stock.symbol === '1196') {
+        const selected = [
+            { title: "偉祿科技股份(01196.HK)拓展算力與AI數據中心項目，佈局東南亞市場", source: "[AASTOCKS]", time: "10/12 14:30" },
+            { title: "偉祿集團正式更名為「偉祿科技股份有限公司」，加速科技轉型", source: "[智通財經]", time: "10/08 09:15" },
+            { title: "偉祿科技股份－新(01196.HK)成交維持活躍，市場看好科技新佈局", source: "[富途資訊]", time: "09/25 11:20" }
         ];
         return selected.map(n => `
         <div class="card" style="padding: 12px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:8px; margin-bottom:8px;">
@@ -1556,7 +1581,7 @@ function renderSubSelection(type) {
 }
 
 function renderStockDetail() {
-    const stock = state.marketData.find(s => s.symbol === state.currentStock);
+    const stock = state.marketData.find(s => s.symbol === state.currentStock || s.alias === state.currentStock || (s.isHK && s.symbol.replace(/^0+/, '') === String(state.currentStock)));
     if (!stock) return '<h3>Error loading stock.</h3>';
 
     document.getElementById('header-title').textContent = `${stock.name} ${stock.symbol}`;
@@ -3251,7 +3276,8 @@ function buildTradePage() {
     const container = document.createElement('div');
 
     let initSym = state.tradeTarget ? state.tradeTarget.symbol : (state.lastTradeSymbol || '2330');
-    const initStock = state.marketData.find(s => s.symbol === initSym);
+    const initStock = window.findStock(initSym);
+    if (initStock) initSym = initStock.symbol;
     let initShares = initStock ? (initStock.lotSizeVal || 1000) : 1000;
 
     let tradeState = {
@@ -3269,11 +3295,11 @@ function buildTradePage() {
         triggerOrderPrice: 0
     };
 
-    const stockInit = state.marketData.find(s => s.symbol === tradeState.symbol);
+    const stockInit = window.findStock(tradeState.symbol);
     if (stockInit) { tradeState.limitPrice = stockInit.price; tradeState.triggerPrice = stockInit.price; tradeState.triggerOrderPrice = stockInit.price; }
 
     const renderForm = () => {
-        const stock = state.marketData.find(s => s.symbol === tradeState.symbol);
+        const stock = window.findStock(tradeState.symbol);
         const currentPrice = stock ? stock.price : 0;
 
         let estPrice = currentPrice;
