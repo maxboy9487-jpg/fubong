@@ -40,11 +40,10 @@ function getOrGenerateAccount(type, branch) {
 
 const DEFAULT_ACCOUNTS = [
     { type: 'HK', branch: '三重', id: '3587201', name: '黃建豪' },
-    { type: 'HK', branch: '樹林', id: '9482506', name: '林雅雅' },
-    { type: 'HK', branch: '永康', id: '8451039', name: '李建寧' },
+    { type: 'HK', branch: '樹林', id: '9482506', name: '林雅婷' },
+    { type: 'HK', branch: '南屯', id: '6394749', name: '曾儒俊' },
     { type: 'HK', branch: '南港', id: '3893919', name: '林怡君' },
-    { type: 'HK', branch: '彰化', id: '2392749', name: '陳樂文' },
-    { type: 'HK', branch: '南屯', id: '6394749', name: '曾儒俊' }
+    { type: 'HK', branch: '彰化', id: '2392749', name: '陳樂文' }
 ];
 
 let customAccounts = JSON.parse(localStorage.getItem('stockCustomAccounts') || '[]');
@@ -56,7 +55,7 @@ const getAccountDisplayName = (account) => {
     if (!account) return '';
     const prefix = account.type === 'HK' ? '複' : '證';
     const nameStr = account.name || '名稱';
-    return `${prefix}-${account.branch}${account.id}-${nameStr}`;
+    return `${prefix}-${account.branch}${account.id} ${nameStr}`;
 };
 
 if ((!window.currentAccountId || !ACCOUNTS.some(a => a.id === window.currentAccountId)) && ACCOUNTS.length > 0) {
@@ -167,7 +166,7 @@ window.renderAccountSelectionOverlay = function () {
 window.promptAddAccount = function () {
     const branch = prompt('請輸入分公司地區 (例如: 台中)');
     if (!branch) return;
-    const isHK = confirm('是否為海外股帳戶？\n[確定] 海外股 (複-xxx0000000-名稱)\n[取消] 台股 (證-xxx0000000-名稱)');
+    const isHK = confirm('是否為海外股帳戶？\n[確定] 海外股 (複-xxx0000000 名稱)\n[取消] 台股 (證-xxx0000000 名稱)');
     const type = isHK ? 'HK' : 'TW';
     const id = prompt('請輸入帳號數字 (例如: 1234567)');
     if (!id) return;
