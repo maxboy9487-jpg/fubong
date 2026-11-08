@@ -2634,6 +2634,28 @@ window.parsedMarketData.push({
     isStatic: true, isHK: true 
 });
 
+window.parsedMarketData.push({ 
+    symbol: '02450', alias: '2450', name: '淮北綠金股份', price: 26.5, change: 0.00, prevClose: 26.5, 
+    open: 26.5, high: 26.5, low: 26.5, volume: 0, volumeStr: '0', turnoverAmount: '0', 
+    marketCap: '--', totalShares: '--', circulatingShares: '--', circulatingValue: '--',
+    peTTM: '--', peStatic: '--', pb: '--', peDynamic: '--',
+    turnoverRateStr: '--', bidRatio: '--', volumeRatio: '--', avgPriceStr: '26.5', amplitudeStr: '0.00%',
+    high52: 26.5, low52: 26.5, historyHigh: 26.5, historyLow: 26.5, lotSize: '1500股', lotSizeVal: 1500,
+    beta: 1.0, divYieldTTM: '--', divYieldLFY: '--', divYieldRateTTM: '--', divYieldRateLFY: '--',
+    isStatic: true, isHK: true 
+});
+
+window.parsedMarketData.push({ 
+    symbol: 'BMGL', name: 'Basel Medical', price: 5.16, change: 0.00, prevClose: 5.16, 
+    open: 5.16, high: 5.16, low: 5.16, volume: 0, volumeStr: '0', turnoverAmount: '0', 
+    marketCap: '--', totalShares: '--', circulatingShares: '--', circulatingValue: '--',
+    peTTM: '--', peStatic: '--', pb: '--', peDynamic: '--',
+    turnoverRateStr: '--', bidRatio: '--', volumeRatio: '--', avgPriceStr: '5.16', amplitudeStr: '0.00%',
+    high52: 5.16, low52: 5.16, historyHigh: 5.16, historyLow: 5.16, lotSize: '1股', lotSizeVal: 1,
+    beta: 1.0, divYieldTTM: '--', divYieldLFY: '--', divYieldRateTTM: '--', divYieldRateLFY: '--',
+    isStatic: true, isUS: true 
+});
+
 
 
 

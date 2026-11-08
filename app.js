@@ -1,5 +1,6 @@
 // --- Constants & Config ---
-const CONFIG = { FEE_RATE: 0.001425, MIN_FEE: 20, TAX_RATE: 0.003, HKD_RATE: 4.05 }; // Mock HKD rate
+const CONFIG = { FEE_RATE: 0.001425, MIN_FEE: 20, TAX_RATE: 0.003, HKD_RATE: 4.05, USD_RATE: 32.5 }; // Mock HKD & USD rates
+const getStockRate = (stock) => stock ? (stock.isUS ? CONFIG.USD_RATE : (stock.isHK ? CONFIG.HKD_RATE : 1)) : 1;
 
 // --- Global UI State ---
 window.portfolioTab = 'inventory';
@@ -256,7 +257,8 @@ function showSystemNotification(title, desc) {
 
 window.findStock = function (sym) {
     if (!sym) return null;
-    return state.marketData.find(s => s.symbol === sym || s.alias === sym || (s.isHK && s.symbol.replace(/^0+/, '') === String(sym)));
+    const q = String(sym).toLowerCase();
+    return state.marketData.find(s => s.symbol.toLowerCase() === q || (s.alias && s.alias.toLowerCase() === q) || (s.isHK && s.symbol.replace(/^0+/, '') === String(sym)));
 };
 
 window.manualPriceUpdate = function (symbol, newPrice) {
@@ -420,7 +422,7 @@ function processOrderExecution(order, execPrice) {
     let shares = order.shares;
     const stock = state.marketData.find(s => s.symbol === order.symbol);
     let isHK = stock && stock.isHK;
-    let rate = isHK ? CONFIG.HKD_RATE : 1;
+    let rate = getStockRate(stock);
     let twdValue = execPrice * shares * rate;
     let marginType = order.marginType || 'cash';
 
@@ -536,7 +538,7 @@ function submitOrder(tradeParams, isTriggeredBySmart = false) {
     // Final Safety Check (Blocking logic)
     const stockObj = state.marketData.find(s => s.symbol === symbol);
     let isHK = stockObj && stockObj.isHK;
-    let rate = isHK ? CONFIG.HKD_RATE : 1;
+    let rate = getStockRate(stockObj);
     let currentPrice = stock.price;
     let estPrice = priceType === 'market' ? currentPrice : limitPrice;
     let totalTwd = estPrice * shares * rate;
@@ -711,7 +713,7 @@ function recordAssetHistory() {
     let totalStockValue = state.portfolio.reduce((sum, pos) => {
         let stock = state.marketData.find(x => x.symbol === pos.symbol);
         let currentPrice = stock ? stock.price : pos.avgPrice;
-        let rate = (stock && stock.isHK) ? CONFIG.HKD_RATE : 1;
+        let rate = getStockRate(stock);
         let pTwd = currentPrice * rate;
 
         const currentVal = pTwd * pos.shares;
@@ -1162,6 +1164,46 @@ function generateMockNews(stock) {
         `).join('');
     }
 
+    if (stock.symbol === 'BMGL') {
+        const selected = [
+            { title: "Basel Medical (BMGL) 拓展東南亞骨科與創傷醫療服務據點", source: "[Reuters]", time: "11/06 21:30" },
+            { title: "Basel Medical Group 門診量穩定成長，深化診所策略合作", source: "[Benzinga]", time: "10/29 20:15" },
+            { title: "醫療類股焦點：Basel Medical (BMGL) 獲機構投資人關注", source: "[MarketWatch]", time: "10/18 22:05" }
+        ];
+        return selected.map(n => `
+        <div class="card" style="padding: 12px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:8px; margin-bottom:8px;">
+            <div style="color:var(--text-primary); font-weight:600; margin-bottom:4px; font-size:0.95rem;">${n.title}</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                <div style="color:var(--text-secondary); font-size:0.8rem;">${n.source} ${n.time}</div>
+                <div style="display:flex; gap:6px;">
+                    <button class="btn btn-outline" style="padding:2px 8px; font-size:0.75rem; color:var(--color-up); border-color:var(--color-up);" onclick="triggerNewsEvent('${stock.symbol}', 'pump')">利多拉抬</button>
+                    <button class="btn btn-outline" style="padding:2px 8px; font-size:0.75rem; color:var(--color-down); border-color:var(--color-down);" onclick="triggerNewsEvent('${stock.symbol}', 'dump')">利空打壓</button>
+                </div>
+            </div>
+        </div>
+        `).join('');
+    }
+
+    if (stock.symbol === '02450' || stock.symbol === '2450') {
+        const selected = [
+            { title: "淮北綠金股份(02450.HK)綠色建材與骨料業務穩健推進，產能利用率提升", source: "[AASTOCKS]", time: "11/05 15:10" },
+            { title: "淮北綠金股份(02450.HK)持續深化綠色礦山建設，區域基建需求帶動出貨", source: "[智通財經]", time: "10/28 10:45" },
+            { title: "《異動》淮北綠金股份(02450.HK)交投轉趨活躍，資金關注基建材料板塊", source: "[富途資訊]", time: "10/19 14:15" }
+        ];
+        return selected.map(n => `
+        <div class="card" style="padding: 12px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:8px; margin-bottom:8px;">
+            <div style="color:var(--text-primary); font-weight:600; margin-bottom:4px; font-size:0.95rem;">${n.title}</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                <div style="color:var(--text-secondary); font-size:0.8rem;">${n.source} ${n.time}</div>
+                <div style="display:flex; gap:6px;">
+                    <button class="btn btn-outline" style="padding:2px 8px; font-size:0.75rem; color:var(--color-up); border-color:var(--color-up);" onclick="triggerNewsEvent('${stock.symbol}', 'pump')">利多拉抬</button>
+                    <button class="btn btn-outline" style="padding:2px 8px; font-size:0.75rem; color:var(--color-down); border-color:var(--color-down);" onclick="triggerNewsEvent('${stock.symbol}', 'dump')">利空打壓</button>
+                </div>
+            </div>
+        </div>
+        `).join('');
+    }
+
     const uptrends = [
         `外資連三買！${stock.name} 突破前高有望，分析師調高目標價`,
         `${stock.name} 獲大單加持，第四季營收有望衝出新高點`,
@@ -1580,13 +1622,13 @@ function renderSubSelection(type) {
 }
 
 function renderStockDetail() {
-    const stock = state.marketData.find(s => s.symbol === state.currentStock || s.alias === state.currentStock || (s.isHK && s.symbol.replace(/^0+/, '') === String(state.currentStock)));
+    const stock = window.findStock(state.currentStock);
     if (!stock) return '<h3>Error loading stock.</h3>';
 
     document.getElementById('header-title').textContent = `${stock.name} ${stock.symbol}`;
     let pctChange = (stock.change / (stock.price - stock.change || 1)) * 100;
 
-    if (stock.isHK) {
+    if (stock.isHK || stock.isUS) {
         const upColor = 'var(--color-up)';
         const downColor = 'var(--color-down)';
         const priceColor = stock.change > 0 ? upColor : (stock.change < 0 ? downColor : '#eee');
@@ -2101,9 +2143,10 @@ function getPortfolioTabContent() {
                 const stock = state.marketData.find(s => s.symbol === pos.symbol);
                 let currentPrice = stock ? stock.price : pos.avgPrice;
                 let isHKPos = stock && stock.isHK;
-                let marketName = isHKPos ? '香港' : '台灣';
-                let currencyName = isHKPos ? '港幣' : '台幣';
-                let rate = isHKPos ? CONFIG.HKD_RATE : 1;
+                let isUSPos = stock && stock.isUS;
+                let marketName = isUSPos ? '美國' : (isHKPos ? '香港' : '台灣');
+                let currencyName = isUSPos ? '美金' : (isHKPos ? '港幣' : '台幣');
+                let rate = getStockRate(stock);
 
                 let costTwd = pos.avgPrice * pos.shares;
                 let currentValTwd = currentPrice * pos.shares * rate;
@@ -2255,7 +2298,7 @@ function getPortfolioTabContent() {
             state.portfolio.forEach((p, idx) => {
                 let stock = state.marketData.find(x => x.symbol === p.symbol);
                 let price = stock ? stock.price : p.avgPrice;
-                let rate = (stock && stock.isHK) ? CONFIG.HKD_RATE : 1;
+                let rate = getStockRate(stock);
 
                 let currentVal = price * rate * p.shares;
                 let { fee: simFee, tax: simTax } = calculateFees(currentVal, 'sell');
@@ -2470,6 +2513,7 @@ function getPortfolioTabContent() {
 
                     const stockO = state.marketData.find(s => s.symbol === o.symbol);
                     let isHKLine = stockO && stockO.isHK;
+                    let isUSLine = stockO && stockO.isUS;
                     let isExpanded = !!window.expandedOrders[o.id];
                     let chevronClass = isExpanded ? 'fa-chevron-up' : 'fa-chevron-down';
 
@@ -2485,7 +2529,7 @@ function getPortfolioTabContent() {
                                     <div style="display:flex; flex-direction:column; gap:3px; min-width: 0; justify-content:center;">
                                         <div style="font-weight:bold; font-size:0.9rem; color:#fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${o.name}</div>
                                         <div style="display:flex; align-items:center; gap:4px;">
-                                            ${isHKLine ? `<span style="background-color:#7e57c2; color:white; padding:1px 3px; border-radius:3px; font-size:0.7rem; font-weight:bold;">HK</span>` : `<span style="background-color:#ffa726; color:white; padding:1px 3px; border-radius:3px; font-size:0.7rem; font-weight:bold;">TW</span>`}
+                                            ${isUSLine ? `<span style="background-color:#0288d1; color:white; padding:1px 3px; border-radius:3px; font-size:0.7rem; font-weight:bold;">US</span>` : isHKLine ? `<span style="background-color:#7e57c2; color:white; padding:1px 3px; border-radius:3px; font-size:0.7rem; font-weight:bold;">HK</span>` : `<span style="background-color:#ffa726; color:white; padding:1px 3px; border-radius:3px; font-size:0.7rem; font-weight:bold;">TW</span>`}
                                             <span style="color:${sideColor}; font-size:0.78rem; font-weight:bold;">${o.side === 'buy' ? '買進' : '賣出'}</span>
                                             <span style="color:${sideColor}; font-size:0.78rem; font-weight:bold; margin-left:2px;">限價</span>
                                         </div>
@@ -2496,8 +2540,8 @@ function getPortfolioTabContent() {
                                     <div style="font-size:0.9rem; color:#fff; font-family:var(--font-mono);">${o.status === 'executed' ? formatNumber(execShares, 0) + '股' : '-'}</div>
                                 </div>
                                 <div style="flex:1.2; display:flex; flex-direction:column; gap:3px; justify-content:center; text-align:right; padding-right:12px;">
-                                    <div style="font-size:0.9rem; color:#fff; font-family:var(--font-mono);">${formatNumber(o.price, isHKLine ? 2 : 0)}</div>
-                                    <div style="font-size:0.9rem; color:#fff; font-family:var(--font-mono);">${o.status === 'executed' ? formatNumber(execAvgPrice, isHKLine ? 2 : 0) : '-'}</div>
+                                    <div style="font-size:0.9rem; color:#fff; font-family:var(--font-mono);">${formatNumber(o.price, (isHKLine || isUSLine) ? 2 : 0)}</div>
+                                    <div style="font-size:0.9rem; color:#fff; font-family:var(--font-mono);">${o.status === 'executed' ? formatNumber(execAvgPrice, (isHKLine || isUSLine) ? 2 : 0) : '-'}</div>
                                 </div>
                                 <div style="flex:0.9; display:flex; align-items:center; justify-content:flex-end; gap:8px; padding-right:8px;">
                                     <div style="display:flex; flex-direction:column; align-items:flex-end; justify-content:center;">
@@ -2513,7 +2557,7 @@ function getPortfolioTabContent() {
                             <div style="background-color: #232a35; border-radius: 8px; padding: 12px 16px; margin: 4px 12px 12px 12px; font-size: 0.88rem; display: flex; flex-direction: column; gap: 8px;">
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <span style="color:#e1e2e6;">觸價價格</span>
-                                    <span style="color:#ffffff;">${o.status === 'executed' ? formatNumber(o.price, isHKLine ? 2 : 0) : '-'}</span>
+                                    <span style="color:#ffffff;">${o.status === 'executed' ? formatNumber(o.price, (isHKLine || isUSLine) ? 2 : 0) : '-'}</span>
                                 </div>
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <span style="color:#e1e2e6;">委託時間</span>
@@ -2577,6 +2621,7 @@ function getPortfolioTabContent() {
 
                     const stockH = state.marketData.find(s => s.symbol === h.symbol);
                     let isHKLine = stockH && stockH.isHK;
+                    let isUSLine = stockH && stockH.isUS;
                     let isExpanded = !!window.expandedTrades[h.id];
                     let chevronClass = isExpanded ? 'fa-chevron-up' : 'fa-chevron-down';
 
@@ -2590,7 +2635,7 @@ function getPortfolioTabContent() {
                                     <div style="display:flex; flex-direction:column; gap:3px; min-width: 0; justify-content:center;">
                                         <div style="font-weight:bold; font-size:0.9rem; color:#fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${h.name}</div>
                                         <div style="display:flex; align-items:center; gap:4px;">
-                                            ${isHKLine ? `<span style="background-color:#7e57c2; color:white; padding:1px 3px; border-radius:3px; font-size:0.7rem; font-weight:bold;">HK</span>` : `<span style="background-color:#ffa726; color:white; padding:1px 3px; border-radius:3px; font-size:0.7rem; font-weight:bold;">TW</span>`}
+                                            ${isUSLine ? `<span style="background-color:#0288d1; color:white; padding:1px 3px; border-radius:3px; font-size:0.7rem; font-weight:bold;">US</span>` : isHKLine ? `<span style="background-color:#7e57c2; color:white; padding:1px 3px; border-radius:3px; font-size:0.7rem; font-weight:bold;">HK</span>` : `<span style="background-color:#ffa726; color:white; padding:1px 3px; border-radius:3px; font-size:0.7rem; font-weight:bold;">TW</span>`}
                                             <span style="color:#888; font-size:0.8rem; font-family:var(--font-mono); font-weight:500;">${h.symbol}</span>
                                         </div>
                                     </div>
@@ -2601,7 +2646,7 @@ function getPortfolioTabContent() {
                                 </div>
                                 <div style="flex:1.2; display:flex; align-items:center; justify-content:flex-end; gap:8px; padding-right:8px;">
                                     <div style="display:flex; flex-direction:column; justify-content:center; text-align:right;">
-                                        <div style="font-size:0.9rem; color:#fff; font-family:var(--font-mono);">${formatNumber(tradePrice, isHKLine ? 2 : 0)}</div>
+                                        <div style="font-size:0.9rem; color:#fff; font-family:var(--font-mono);">${formatNumber(tradePrice, (isHKLine || isUSLine) ? 2 : 0)}</div>
                                         <div style="font-size:0.9rem; color:#fff; font-family:var(--font-mono);">${formatNumber(h.shares, 0)}股</div>
                                     </div>
                                     <div style="display:flex; align-items:center; justify-content:center; width:12px; flex-shrink:0;">
@@ -2613,7 +2658,7 @@ function getPortfolioTabContent() {
                             <div style="background-color: #181818; border-radius: 8px; padding: 8px 12px; margin: 0px 8px 10px 8px; font-size: 0.82rem; color: #ccc; display: flex; flex-direction: column; gap: 5px;">
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <span style="color:#666;">成交市值</span>
-                                    <span style="font-family:var(--font-mono); font-weight:500;">${formatNumber(h.shares * tradePrice, isHKLine ? 2 : 0)}</span>
+                                    <span style="font-family:var(--font-mono); font-weight:500;">${formatNumber(h.shares * tradePrice, (isHKLine || isUSLine) ? 2 : 0)}</span>
                                 </div>
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <span style="color:#666;">成交時間</span>
@@ -2662,7 +2707,7 @@ function getPortfolioTabContent() {
             state.portfolio.forEach(pos => {
                 const stock = state.marketData.find(s => s.symbol === pos.symbol);
                 let isHKPos = stock && stock.isHK;
-                let rate = isHKPos ? CONFIG.HKD_RATE : 1;
+                let rate = getStockRate(stock);
                 let currentPrice = stock ? stock.price : (pos.avgPrice / rate);
 
                 let localAvgPrice = pos.avgPrice / rate;
@@ -2777,7 +2822,7 @@ function getPortfolioTabContent() {
                 state.portfolio.forEach(pos => {
                     const stock = state.marketData.find(s => s.symbol === pos.symbol);
                     let isHKPos = stock && stock.isHK;
-                    let rate = isHKPos ? CONFIG.HKD_RATE : 1;
+                    let rate = getStockRate(stock);
                     let currentPrice = stock ? stock.price : (pos.avgPrice / rate);
 
                     let localAvgPrice = pos.avgPrice / rate;
@@ -2796,7 +2841,7 @@ function getPortfolioTabContent() {
                                     ${pos.name}
                                 </span>
                                 <div style="display:flex; align-items:center; white-space: nowrap; margin-top: 2px;">
-                                    ${isHKPos ? `<span style="background-color: #5c3ec2; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">HK</span>` : `<span style="background-color: #e67e22; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">TW</span>`}
+                                    ${(stock && stock.isUS) ? `<span style="background-color: #0288d1; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">US</span>` : isHKPos ? `<span style="background-color: #5c3ec2; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">HK</span>` : `<span style="background-color: #e67e22; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">TW</span>`}
                                     <span style="color: #ffffff; font-size: 0.85rem; font-weight: 500; font-family:var(--font-mono);">${displaySymbol}</span>
                                 </div>
                             </div>
@@ -2900,6 +2945,7 @@ function getPortfolioTabContent() {
                     let displaySymbol = h.symbol.startsWith('00') ? h.symbol.slice(1) : h.symbol;
                     const stockH = state.marketData.find(s => s.symbol === h.symbol);
                     let isHKLine = stockH && stockH.isHK;
+                    let isUSLine = stockH && stockH.isUS;
                     let pnlPct = (h.buyAvgPrice && h.shares) ? (h.profit / (h.buyAvgPrice * h.shares)) * 100 : 0;
                     sellsHtml += `
                         <div style="display:flex; align-items:center; border-bottom: 1px solid #eee; padding: 9px 0;">
@@ -2907,7 +2953,7 @@ function getPortfolioTabContent() {
                             <div style="width: 26%; text-align:left; flex-shrink: 0; display:flex; flex-direction:column; gap: 4px; min-width: 0; padding-left: 8px;">
                                 <div style="font-weight:bold; color:#000000; font-size:1.02rem; line-height: 1.1; display: inline-block; max-width: 4em; word-break: break-all; white-space: normal;">${h.name}</div>
                                 <div style="display:flex; align-items:center; margin-top: 4px; white-space: nowrap;">
-                                    ${isHKLine ? `<span style="background-color: #5c3ec2; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">HK</span>` : `<span style="background-color: #e67e22; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">TW</span>`}
+                                    ${isUSLine ? `<span style="background-color: #0288d1; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">US</span>` : isHKLine ? `<span style="background-color: #5c3ec2; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">HK</span>` : `<span style="background-color: #e67e22; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.78rem; font-weight: 500; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">TW</span>`}
                                     <span style="color:#4b5563; font-size:0.85rem; font-family:var(--font-mono); font-weight:500;">${displaySymbol}</span>
                                 </div>
                             </div>
@@ -2986,7 +3032,7 @@ function getPortfolioTabContent() {
         let totalHeldTwd = state.portfolio.reduce((sum, pos) => {
             const st = state.marketData.find(x => x.symbol === pos.symbol);
             const price = st ? st.price : pos.avgPrice;
-            const r = (st && st.isHK) ? CONFIG.HKD_RATE : 1;
+            const r = getStockRate(st);
             return sum + (price * r * pos.shares);
         }, 0);
         const totalEquityEst = state.balance + totalHeldTwd;
@@ -2995,7 +3041,7 @@ function getPortfolioTabContent() {
         const tsmc = state.marketData.find(s => s.symbol === '2330');
         const refStock = tsmc || state.marketData.filter(s => !s.isIndex && s.price > 0).sort((a, b) => a.price - b.price)[0];
         const refLot = refStock ? (refStock.lotSizeVal || 1000) : 1000;
-        const refRate = (refStock && refStock.isHK) ? CONFIG.HKD_RATE : 1;
+        const refRate = getStockRate(refStock);
         const refCostPerLot = refStock ? (refStock.price * refRate * refLot * 1.001425) : 1;
         const maxLots = refStock ? Math.floor(state.balance / refCostPerLot) : 0;
         return topHtml + `
@@ -3306,7 +3352,7 @@ function buildTradePage() {
         if (tradeState.priceType === 'smart') { estPrice = tradeState.triggerExecuteType === 'limit' ? tradeState.triggerOrderPrice : currentPrice; }
 
         let isHK = stock && stock.isHK;
-        let rate = isHK ? CONFIG.HKD_RATE : 1;
+        let rate = getStockRate(stock);
         let estTwdPrice = estPrice * rate;
         let totalVal = estTwdPrice * tradeState.shares;
 
@@ -3415,8 +3461,8 @@ function buildTradePage() {
                     <label class="form-label">搜尋標的 (輸入代號或名稱)</label>
                     <input type="text" id="trade-search" class="form-control" placeholder="例如: 2330 或 台積電" value="${tradeState.searchQuery}" style="margin-bottom:8px; border-color:var(--accent-blue);">
                     <select id="trade-symbol" class="form-control" style="background:var(--bg-input);">
-                        ${state.marketData.filter(s => !s.isIndex && (s.symbol.includes(tradeState.searchQuery) || s.name.includes(tradeState.searchQuery)))
-                .map(s => `<option value="${s.symbol}" ${s.symbol === tradeState.symbol ? 'selected' : ''}>${s.symbol} ${s.name} ${s.isHK ? '(HK)' : ''}</option>`)
+                        ${state.marketData.filter(s => !s.isIndex && (s.symbol.toLowerCase().includes(tradeState.searchQuery.toLowerCase()) || s.name.toLowerCase().includes(tradeState.searchQuery.toLowerCase())))
+                .map(s => `<option value="${s.symbol}" ${s.symbol === tradeState.symbol ? 'selected' : ''}>${s.symbol} ${s.name} ${s.isHK ? '(HK)' : (s.isUS ? '(US)' : '')}</option>`)
                 .join('') || '<option disabled>查對相符股票</option>'}
                     </select>
                 </div>
@@ -3534,7 +3580,7 @@ function buildTradePage() {
         container.querySelector('#trade-search').oninput = (e) => {
             tradeState.searchQuery = e.target.value;
             // Auto-select first result if current symbol is filtered out
-            const filtered = state.marketData.filter(s => !s.isIndex && (s.symbol.includes(tradeState.searchQuery) || s.name.includes(tradeState.searchQuery)));
+            const filtered = state.marketData.filter(s => !s.isIndex && (s.symbol.toLowerCase().includes(tradeState.searchQuery.toLowerCase()) || s.name.toLowerCase().includes(tradeState.searchQuery.toLowerCase())));
             if (filtered.length > 0 && !filtered.some(s => s.symbol === tradeState.symbol)) {
                 tradeState.symbol = filtered[0].symbol;
                 state.lastTradeSymbol = tradeState.symbol;
@@ -3606,7 +3652,7 @@ function buildTradePage() {
 
                 const price = stock.price;
                 const stockForRate = state.marketData.find(s => s.symbol === symbol);
-                const rate = (stockForRate && stockForRate.isHK) ? CONFIG.HKD_RATE : 1;
+                const rate = getStockRate(stockForRate);
 
                 let targetShares = 0;
                 let opType = 'close';
@@ -3825,7 +3871,7 @@ function checkPortfolioPnlAlerts() {
     state.portfolio.forEach(pos => {
         const stock = state.marketData.find(s => s.symbol === pos.symbol);
         if (!stock) return;
-        const rate = (stock && stock.isHK) ? CONFIG.HKD_RATE : 1;
+        const rate = getStockRate(stock);
         const localAvgPrice = pos.avgPrice / rate;
         const localCost = localAvgPrice * pos.shares;
         const localCurrentVal = stock.price * pos.shares;
@@ -3918,7 +3964,7 @@ function updatePortfolioRowUI(stock) {
     const pctEl = document.getElementById(`inv-pnlpct-${stock.symbol}`);
     if (!pEl || !pctEl) return;
 
-    let rate = stock.isHK ? CONFIG.HKD_RATE : 1;
+    let rate = getStockRate(stock);
     let localAvgPrice = pos.avgPrice / rate;
     let localCost = localAvgPrice * pos.shares;
     let localCurrentVal = stock.price * pos.shares;
