@@ -2413,19 +2413,19 @@ function getPortfolioTabContent() {
         if (!window.ordersSubTab) window.ordersSubTab = 'orders';
 
         let ordersHtml = `
-            <div style="background-color: #0f1116; min-height: 100vh; color: #333; padding: 12px 16px;">
+            <div style="background-color: #111317; min-height: 100vh; color: #333; padding: 14px 15px;">
                 <!-- Pill group -->
-                <div style="display:flex; background-color: #1a1a1a; border-radius: 6px; padding: 3px; margin-bottom: 10px;">
-                    <div style="flex:1; text-align:center; padding: 5px 0; border-radius: 4px; cursor:pointer; font-weight:bold; font-size:0.88rem; transition: all 0.2s; ${window.ordersSubTab === 'orders' ? 'background-color: #0086bd; color: white;' : 'color: #aaa;'}" onclick="window.ordersSubTab='orders'; window.switchPortfolioTab('orders', true);">委託回報</div>
-                    <div style="flex:1; text-align:center; padding: 5px 0; border-radius: 4px; cursor:pointer; font-weight:bold; font-size:0.88rem; transition: all 0.2s; ${window.ordersSubTab === 'trades' ? 'background-color: #0086bd; color: white;' : 'color: #aaa;'}" onclick="window.ordersSubTab='trades'; window.switchPortfolioTab('orders', true);">成交回報</div>
+                <div style="display:flex; background-color: #22262f; border-radius: 10px; padding: 3px; margin-bottom: 14px;">
+                    <div style="flex:1; text-align:center; padding: 6px 0; border-radius: 7px; cursor:pointer; font-weight:500; font-size:1rem; letter-spacing:0.5px; transition: all 0.2s; ${window.ordersSubTab === 'orders' ? 'background-color: #3f96c6; color: white;' : 'color: #e6e6e6;'}" onclick="window.ordersSubTab='orders'; window.switchPortfolioTab('orders', true);">委託回報</div>
+                    <div style="flex:1; text-align:center; padding: 6px 0; border-radius: 7px; cursor:pointer; font-weight:500; font-size:1rem; letter-spacing:0.5px; transition: all 0.2s; ${window.ordersSubTab === 'trades' ? 'background-color: #3f96c6; color: white;' : 'color: #e6e6e6;'}" onclick="window.ordersSubTab='trades'; window.switchPortfolioTab('orders', true);">成交回報</div>
                 </div>
                 
                 <!-- Filter Bar -->
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; color: #0e97c9; font-weight: bold; font-size: 0.88rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 18px; color: #4a9fd3; font-weight: 500; font-size: 0.95rem;">
                     <div style="display:flex; align-items:center;">
                         ${window.ordersSubTab === 'orders' ? `
-                        <span style="color: #0e97c9;">批次刪單</span>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e97c9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; flex-shrink:0; margin-left: 4px;" onclick="state.orders=[]; window.switchPortfolioTab('orders', true); showToast('已全刪未成交委託');">
+                        <span style="color: #4a9fd3;">批次刪單</span>
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4a9fd3" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; flex-shrink:0; margin-left: 2px;" onclick="state.orders=[]; window.switchPortfolioTab('orders', true); showToast('已全刪未成交委託');">
                             <!-- Back square border -->
                             <path d="M8 20h9a3 3 0 0 0 3-3V8" />
                             <!-- Front square -->
@@ -2440,27 +2440,27 @@ function getPortfolioTabContent() {
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                         </svg>
                         `}
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; flex-shrink:0; margin-left: 12px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; flex-shrink:0; margin-left: 18px;">
                             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
                         </svg>
                     </div>
-                    <div style="display:flex; align-items:center; gap: 14px; color: #ffffff;">
-                        <i class="fa-solid fa-rotate" style="font-size: 0.95rem; cursor:pointer;" onclick="window.switchPortfolioTab('orders', true)"></i>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; flex-shrink:0;">
-                            <circle cx="12" cy="12" r="1.2" fill="#ffffff" />
-                            <circle cx="19" cy="12" r="1.2" fill="#ffffff" />
-                            <circle cx="5" cy="12" r="1.2" fill="#ffffff" />
+                    <div style="display:flex; align-items:center; gap: 22px; color: #ffffff;">
+                        <i class="fa-solid fa-rotate" style="font-size: 1.05rem; cursor:pointer;" onclick="window.switchPortfolioTab('orders', true)"></i>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; flex-shrink:0;">
+                            <circle cx="12" cy="12" r="1.4" fill="#ffffff" />
+                            <circle cx="19.5" cy="12" r="1.4" fill="#ffffff" />
+                            <circle cx="4.5" cy="12" r="1.4" fill="#ffffff" />
                         </svg>
                     </div>
                 </div>
                 
                 <!-- List Header -->
                 ${window.ordersSubTab === 'orders' ? `
-                <div style="display:flex; align-items:center; color: #ffffff; font-size: 0.82rem; font-weight: 500; padding-bottom: 6px; margin-bottom: 6px;">
-                    <div style="flex:1.6; text-align:left; padding-left: 8px;">商品/類別</div>
-                    <div style="flex:1.1; text-align:right; padding-right: 12px;">委量/<br>已成</div>
-                    <div style="flex:1.2; text-align:right; padding-right: 12px;">委價/<br>成交均價</div>
-                    <div style="flex:0.9; text-align:right; padding-right: 28px;">狀態</div>
+                <div style="display:flex; align-items:center; color: #e6e6e6; font-size: 0.92rem; font-weight: 400; line-height:1.3; padding-bottom: 10px;">
+                    <div style="flex:1.75; text-align:left; padding-left: 26px;">商品/類別</div>
+                    <div style="flex:0.95; text-align:right;">委量/<br>已成</div>
+                    <div style="flex:1.25; text-align:right;">委價/<br>成交均價</div>
+                    <div style="width:84px; flex-shrink:0; text-align:left; padding-left:10px; box-sizing:border-box;">狀態</div>
                 </div>
                 ` : `
                 <div style="display:flex; align-items:center; color: #ffffff; font-size: 0.82rem; font-weight: 500; padding-bottom: 6px; margin-bottom: 6px;">
@@ -2518,72 +2518,67 @@ function getPortfolioTabContent() {
                     let isExpanded = !!window.expandedOrders[o.id];
                     let chevronClass = isExpanded ? 'fa-chevron-up' : 'fa-chevron-down';
 
+                    const decO = (isHKLine || isUSLine) ? 2 : 0;
+                    const marketBadge = isUSLine
+                        ? `<span style="background-color:#8e9ff2; color:#fff; padding:0 4px; border-radius:4px; font-size:0.78rem; font-weight:600; line-height:1.35;">US</span>`
+                        : isHKLine
+                            ? `<span style="background-color:#a78bdb; color:#fff; padding:0 4px; border-radius:4px; font-size:0.78rem; font-weight:600; line-height:1.35;">HK</span>`
+                            : `<span style="background-color:#f0a24a; color:#fff; padding:0 4px; border-radius:4px; font-size:0.78rem; font-weight:600; line-height:1.35;">TW</span>`;
+                    const chevronSvg = isExpanded
+                        ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 15 12 8 19 15"></polyline></svg>`
+                        : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 12 16 19 9"></polyline></svg>`;
+                    const orderTimeDisp = (o.time || '-').replace(' ', '&nbsp;&nbsp;');
+                    const detailRow = (label, value) => `
+                                <div style="display:flex; justify-content:space-between; align-items:center; min-height:20px;">
+                                    <span style="color:#e3e4e8; font-weight:400;">${label}</span>
+                                    <span style="color:#ffffff; font-weight:500;">${value}</span>
+                                </div>`;
+
                     ordersHtml += `
-                        <div style="display:flex; flex-direction:column; border-bottom: 1px solid #222;">
-                            <div style="display:flex; align-items:stretch; padding: 9px 0; cursor:pointer;" onclick="window.toggleOrderExpand(${o.id})">
-                                <div style="flex:1.6; display:flex; align-items:center; gap:6px; text-align:left; padding-left:8px; min-width: 0;">
+                        <div style="display:flex; flex-direction:column;">
+                            <div style="display:flex; align-items:center; padding: 6px 0 8px 0; cursor:pointer;" onclick="window.toggleOrderExpand(${o.id})">
+                                <div style="flex:1.75; display:flex; align-items:center; gap:5px; text-align:left; min-width: 0;">
                                     ${isCancellable ? `
-                                    <div style="background-color: #0086bd; color: white; width: 36px; padding: 8px 0; border-radius: 4px; font-weight: bold; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; flex-shrink:0; font-size: 0.8rem; margin-right: 4px;" onclick="event.stopPropagation(); cancelOrder(${o.id})">
+                                    <div style="background-color: #3f96c6; color: white; width: 21px; padding: 3px 0; border-radius: 3px; font-weight: 500; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; flex-shrink:0; font-size: 0.82rem; line-height:1.2;" onclick="event.stopPropagation(); cancelOrder(${o.id})">
                                         <div>刪</div><div>單</div>
                                     </div>
-                                    ` : ''}
-                                    <div style="display:flex; flex-direction:column; gap:3px; min-width: 0; justify-content:center;">
-                                        <div style="font-weight:bold; font-size:0.9rem; color:#fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${o.name}</div>
-                                        <div style="display:flex; align-items:center; gap:4px;">
-                                            ${isUSLine ? `<span style="background-color:#0288d1; color:white; padding:1px 3px; border-radius:3px; font-size:0.7rem; font-weight:bold;">US</span>` : isHKLine ? `<span style="background-color:#7e57c2; color:white; padding:1px 3px; border-radius:3px; font-size:0.7rem; font-weight:bold;">HK</span>` : `<span style="background-color:#ffa726; color:white; padding:1px 3px; border-radius:3px; font-size:0.7rem; font-weight:bold;">TW</span>`}
-                                            <span style="color:${sideColor}; font-size:0.78rem; font-weight:bold;">${o.side === 'buy' ? '買進' : '賣出'}</span>
-                                            <span style="color:${sideColor}; font-size:0.78rem; font-weight:bold; margin-left:2px;">限價</span>
+                                    ` : `<div style="width:21px; flex-shrink:0;"></div>`}
+                                    <div style="display:flex; flex-direction:column; gap:4px; min-width: 0; justify-content:center;">
+                                        <div style="font-weight:600; font-size:0.98rem; color:#fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${o.name}</div>
+                                        <div style="display:flex; align-items:center; gap:3px;">
+                                            ${marketBadge}
+                                            <span style="color:${o.side === 'buy' ? '#e5484d' : '#00b06b'}; font-size:0.92rem; font-weight:500;">${o.side === 'buy' ? '買進' : '賣出'}&nbsp;${o.type === 'market' ? '市價' : '限價'}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div style="flex:1.1; display:flex; flex-direction:column; gap:3px; justify-content:center; text-align:right; padding-right:12px;">
-                                    <div style="font-size:0.9rem; color:#fff; font-family:var(--font-mono);">${formatNumber(o.shares, 0)}股</div>
-                                    <div style="font-size:0.9rem; color:#fff; font-family:var(--font-mono);">${o.status === 'executed' ? formatNumber(execShares, 0) + '股' : '-'}</div>
+                                <div style="flex:0.95; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:right; align-self:flex-start; padding-top:2px;">
+                                    <div style="font-size:0.98rem; color:#fff; font-weight:600;">${formatNumber(o.shares, 0)}股</div>
+                                    <div style="font-size:0.98rem; color:#fff; font-weight:600;">${o.status === 'executed' ? formatNumber(execShares, 0) + '股' : '-'}</div>
                                 </div>
-                                <div style="flex:1.2; display:flex; flex-direction:column; gap:3px; justify-content:center; text-align:right; padding-right:12px;">
-                                    <div style="font-size:0.9rem; color:#fff; font-family:var(--font-mono);">${formatNumber(o.price, (isHKLine || isUSLine) ? 2 : 0)}</div>
-                                    <div style="font-size:0.9rem; color:#fff; font-family:var(--font-mono);">${o.status === 'executed' ? formatNumber(execAvgPrice, (isHKLine || isUSLine) ? 2 : 0) : '-'}</div>
+                                <div style="flex:1.25; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:right; align-self:flex-start; padding-top:2px;">
+                                    <div style="font-size:0.98rem; color:#fff; font-weight:600;">${formatNumber(o.price, decO)}</div>
+                                    <div style="font-size:0.98rem; color:#fff; font-weight:600;">${o.status === 'executed' ? formatNumber(execAvgPrice, decO) : '-'}</div>
                                 </div>
-                                <div style="flex:0.9; display:flex; align-items:center; justify-content:flex-end; gap:8px; padding-right:8px;">
-                                    <div style="display:flex; flex-direction:column; align-items:flex-end; justify-content:center;">
-                                        <div style="font-size:0.88rem; color:#fff; font-weight:${o.status === 'executed' ? 'normal' : '600'}; line-height:1.15;">${statusTop}</div>
-                                        <div style="font-size:0.88rem; color:#fff; font-weight:${o.status === 'executed' ? 'normal' : '600'}; line-height:1.15;">${statusBottom}</div>
+                                <div style="width:84px; flex-shrink:0; display:flex; align-items:flex-start; justify-content:space-between; padding-left:10px; padding-top:4px; box-sizing:border-box; align-self:flex-start;">
+                                    <div style="display:flex; flex-direction:column; align-items:flex-start;">
+                                        <div style="font-size:0.98rem; color:#fff; font-weight:600; line-height:1.25;">${statusTop}</div>
+                                        <div style="font-size:0.98rem; color:#fff; font-weight:600; line-height:1.25;">${statusBottom}</div>
                                     </div>
-                                    <div style="display:flex; align-items:center; justify-content:center; width:12px; flex-shrink:0;">
-                                        <i class="fa-solid ${chevronClass}" style="font-size:0.65rem; color:#fff;"></i>
+                                    <div style="display:flex; align-items:center; justify-content:center; width:16px; flex-shrink:0; padding-top:6px;">
+                                        ${chevronSvg}
                                     </div>
                                 </div>
                             </div>
                             ${isExpanded ? `
-                            <div style="background-color: #232a35; border-radius: 8px; padding: 12px 16px; margin: 4px 12px 12px 12px; font-size: 0.88rem; display: flex; flex-direction: column; gap: 8px;">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="color:#e1e2e6;">觸價價格</span>
-                                    <span style="color:#ffffff;">${o.status === 'executed' ? formatNumber(o.price, (isHKLine || isUSLine) ? 2 : 0) : '-'}</span>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="color:#e1e2e6;">委託時間</span>
-                                    <span style="color:#ffffff;">${o.time || '-'}</span>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="color:#e1e2e6;">取消</span>
-                                    <span style="color:#ffffff;">${o.status === 'canceled' ? formatNumber(o.shares, 0) + '股' : '-'}</span>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="color:#e1e2e6;">狀態</span>
-                                    <span style="color:#ffffff;">${statusTop}${statusBottom}</span>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="color:#e1e2e6;">有效期限</span>
-                                    <span style="color:#ffffff;">-</span>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="color:#e1e2e6;">委託書號</span>
-                                    <span style="color:#ffffff;">${o.docNo || '-'}</span>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="color:#e1e2e6;">原因</span>
-                                    <span style="color:#ffffff;">-</span>
-                                </div>
+                            <div style="background-color: #232833; border-radius: 10px; padding: 14px 20px 14px 21px; margin: 2px 0 10px 0; font-size: 0.98rem; display: flex; flex-direction: column; gap: 9px;">
+                                ${detailRow('交易時段', '僅盤中時段')}
+                                ${detailRow('觸價價格', o.status === 'executed' ? formatNumber(o.price, decO) : '-')}
+                                ${detailRow('委託時間', orderTimeDisp)}
+                                ${detailRow('取消', o.status === 'canceled' ? formatNumber(o.shares, 0) + '股' : '-')}
+                                ${detailRow('狀態', `${statusTop}${statusBottom}`)}
+                                ${detailRow('有效期限', '')}
+                                ${detailRow('委託書號', o.docNo || '-')}
+                                ${detailRow('原因', '')}
                             </div>
                             ` : ''}
                         </div>
