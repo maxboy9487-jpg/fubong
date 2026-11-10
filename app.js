@@ -2551,20 +2551,20 @@ function getPortfolioTabContent() {
                                         </div>
                                     </div>
                                 </div>
-                                <div style="width:20%; flex-shrink:0; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:right; align-self:flex-start; padding-top:2px;">
-                                    <div style="font-size:0.92rem; color:#fff; font-weight:500;">${formatNumber(o.shares, 0)}股</div>
-                                    <div style="font-size:0.92rem; color:#fff; font-weight:500;">${o.status === 'executed' ? formatNumber(execShares, 0) + '股' : '-'}</div>
+                                <div style="width:20%; flex-shrink:0; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:right;">
+                                    <div style="font-size:0.92rem; color:#fff; font-weight:500; height:21px; display:flex; align-items:center; justify-content:flex-end;">${formatNumber(o.shares, 0)}股</div>
+                                    <div style="font-size:0.92rem; color:#fff; font-weight:500; height:21px; display:flex; align-items:center; justify-content:flex-end;">${o.status === 'executed' ? formatNumber(execShares, 0) + '股' : '-'}</div>
                                 </div>
-                                <div style="width:27%; flex-shrink:0; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:right; align-self:flex-start; padding-top:2px;">
-                                    <div style="font-size:0.92rem; color:#fff; font-weight:500;">${formatNumber(o.price, decO)}</div>
-                                    <div style="font-size:0.92rem; color:#fff; font-weight:500;">${o.status === 'executed' ? formatNumber(execAvgPrice, decO) : '-'}</div>
+                                <div style="width:27%; flex-shrink:0; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:right;">
+                                    <div style="font-size:0.92rem; color:#fff; font-weight:500; height:21px; display:flex; align-items:center; justify-content:flex-end;">${formatNumber(o.price, decO)}</div>
+                                    <div style="font-size:0.92rem; color:#fff; font-weight:500; height:21px; display:flex; align-items:center; justify-content:flex-end;">${o.status === 'executed' ? formatNumber(execAvgPrice, decO) : '-'}</div>
                                 </div>
-                                <div style="width:74px; flex-shrink:0; display:flex; align-items:flex-start; justify-content:flex-start; gap:4px; padding-left:10px; padding-top:2px; box-sizing:border-box; align-self:flex-start;">
-                                    <div style="display:flex; flex-direction:column; align-items:flex-start;">
-                                        <div style="font-size:0.92rem; color:#fff; font-weight:600; line-height:1.3;">${statusTop}</div>
-                                        <div style="font-size:0.92rem; color:#fff; font-weight:600; line-height:1.3;">${statusBottom}</div>
+                                <div style="width:74px; flex-shrink:0; display:flex; align-items:center; justify-content:flex-start; gap:4px; padding-left:10px; box-sizing:border-box;">
+                                    <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start; justify-content:center;">
+                                        <div style="font-size:0.92rem; color:#fff; font-weight:600; height:21px; display:flex; align-items:center;">${statusTop}</div>
+                                        <div style="font-size:0.92rem; color:#fff; font-weight:600; height:21px; display:flex; align-items:center;">${statusBottom}</div>
                                     </div>
-                                    <div style="display:flex; align-items:center; justify-content:center; width:16px; flex-shrink:0; padding-top:10px;">
+                                    <div style="display:flex; align-items:center; justify-content:center; width:16px; flex-shrink:0;">
                                         ${chevronSvg}
                                     </div>
                                 </div>
