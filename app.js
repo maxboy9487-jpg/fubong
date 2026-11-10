@@ -584,7 +584,7 @@ function submitOrder(tradeParams, isTriggeredBySmart = false) {
 
     const order = {
         id: Date.now() + Math.floor(Math.random() * 100),
-        docNo: '900' + Math.floor(1000 + Math.random() * 9000).toString(),
+        docNo: 'X' + Math.floor(Math.random() * 10000).toString().padStart(4, '0'),
         symbol: stock.symbol, name: stock.name, side: side,
         type: priceType, price: estPrice, tif: tif || 'ROD', marginType: marginType,
         shares: shares, status: 'pending',
@@ -3160,7 +3160,7 @@ function renderMorePage() {
                 <div style="display:flex; flex-direction:column; gap:12px;">
                     <div style="display:flex; gap:10px; align-items:center;">
                         <span style="font-size:0.9rem; color:var(--text-secondary); white-space:nowrap; width:70px;">${entry.type === 'order' ? '委託書號' : '成交書號'}:</span>
-                        <input type="text" class="form-control doc-no-input" data-id="${entry.id}" data-type="${entry.type}" value="${entry.docNo || ''}" maxlength="7" placeholder="7位書號" style="flex:1; background:var(--bg-input); border-color:#444;">
+                        <input type="text" class="form-control doc-no-input" data-id="${entry.id}" data-type="${entry.type}" value="${entry.docNo || ''}" maxlength="7" placeholder="例: X0406" style="flex:1; background:var(--bg-input); border-color:#444;">
                     </div>
                     <div style="display:flex; gap:10px; align-items:center;">
                         <span style="font-size:0.9rem; color:var(--text-secondary); white-space:nowrap; width:70px;">時間:</span>
