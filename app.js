@@ -2416,8 +2416,8 @@ function getPortfolioTabContent() {
             <div style="background-color: #111317; min-height: 100vh; color: #333; padding: 14px 15px;">
                 <!-- Pill group -->
                 <div style="display:flex; background-color: #22262f; border-radius: 10px; padding: 3px; margin-bottom: 14px;">
-                    <div style="flex:1; text-align:center; padding: 6px 0; border-radius: 7px; cursor:pointer; font-weight:500; font-size:1rem; letter-spacing:0.5px; transition: all 0.2s; ${window.ordersSubTab === 'orders' ? 'background-color: #3f96c6; color: white;' : 'color: #e6e6e6;'}" onclick="window.ordersSubTab='orders'; window.switchPortfolioTab('orders', true);">委託回報</div>
-                    <div style="flex:1; text-align:center; padding: 6px 0; border-radius: 7px; cursor:pointer; font-weight:500; font-size:1rem; letter-spacing:0.5px; transition: all 0.2s; ${window.ordersSubTab === 'trades' ? 'background-color: #3f96c6; color: white;' : 'color: #e6e6e6;'}" onclick="window.ordersSubTab='trades'; window.switchPortfolioTab('orders', true);">成交回報</div>
+                    <div style="flex:1; text-align:center; padding: 6px 0; border-radius: 7px; cursor:pointer; font-weight:500; font-size:1rem; letter-spacing:0.5px; transition: all 0.2s; ${window.ordersSubTab === 'orders' ? 'background-color: #1793c7; color: white;' : 'color: #e6e6e6;'}" onclick="window.ordersSubTab='orders'; window.switchPortfolioTab('orders', true);">委託回報</div>
+                    <div style="flex:1; text-align:center; padding: 6px 0; border-radius: 7px; cursor:pointer; font-weight:500; font-size:1rem; letter-spacing:0.5px; transition: all 0.2s; ${window.ordersSubTab === 'trades' ? 'background-color: #1793c7; color: white;' : 'color: #e6e6e6;'}" onclick="window.ordersSubTab='trades'; window.switchPortfolioTab('orders', true);">成交回報</div>
                 </div>
                 
                 <!-- Filter Bar -->
@@ -2456,11 +2456,11 @@ function getPortfolioTabContent() {
                 
                 <!-- List Header -->
                 ${window.ordersSubTab === 'orders' ? `
-                <div style="display:flex; align-items:center; color: #e6e6e6; font-size: 0.92rem; font-weight: 400; line-height:1.3; padding-bottom: 10px;">
-                    <div style="flex:1.75; text-align:left; padding-left: 26px;">商品/類別</div>
-                    <div style="flex:0.95; text-align:right;">委量/<br>已成</div>
-                    <div style="flex:1.25; text-align:right;">委價/<br>成交均價</div>
-                    <div style="width:84px; flex-shrink:0; text-align:left; padding-left:10px; box-sizing:border-box;">狀態</div>
+                <div style="display:flex; align-items:center; color: #d6d7db; font-size: 0.85rem; font-weight: 400; line-height:1.3; padding-bottom: 8px;">
+                    <div style="flex:1; min-width:0; text-align:left; padding-left: 26px;">商品/類別</div>
+                    <div style="width:20%; flex-shrink:0; text-align:right;">委量/<br>已成</div>
+                    <div style="width:27%; flex-shrink:0; text-align:right;">委價/<br>成交均價</div>
+                    <div style="width:74px; flex-shrink:0; text-align:left; padding-left:10px; box-sizing:border-box;">狀態</div>
                 </div>
                 ` : `
                 <div style="display:flex; align-items:center; color: #ffffff; font-size: 0.82rem; font-weight: 500; padding-bottom: 6px; margin-bottom: 6px;">
@@ -2531,46 +2531,46 @@ function getPortfolioTabContent() {
                     const detailRow = (label, value) => `
                                 <div style="display:flex; justify-content:space-between; align-items:center; min-height:20px;">
                                     <span style="color:#e3e4e8; font-weight:400;">${label}</span>
-                                    <span style="color:#ffffff; font-weight:500;">${value}</span>
+                                    <span style="color:#ffffff; font-weight:600;">${value}</span>
                                 </div>`;
 
                     ordersHtml += `
-                        <div style="display:flex; flex-direction:column;">
+                        <div style="display:flex; flex-direction:column; border-bottom: 1px solid #2a2e36;">
                             <div style="display:flex; align-items:center; padding: 6px 0 8px 0; cursor:pointer;" onclick="window.toggleOrderExpand(${o.id})">
-                                <div style="flex:1.75; display:flex; align-items:center; gap:5px; text-align:left; min-width: 0;">
+                                <div style="flex:1; display:flex; align-items:center; gap:5px; text-align:left; min-width: 0;">
                                     ${isCancellable ? `
-                                    <div style="background-color: #3f96c6; color: white; width: 21px; padding: 3px 0; border-radius: 3px; font-weight: 500; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; flex-shrink:0; font-size: 0.82rem; line-height:1.2;" onclick="event.stopPropagation(); cancelOrder(${o.id})">
+                                    <div style="background-color: #1793c7; color: white; width: 21px; padding: 3px 0; border-radius: 3px; font-weight: 500; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; flex-shrink:0; font-size: 0.82rem; line-height:1.2;" onclick="event.stopPropagation(); cancelOrder(${o.id})">
                                         <div>刪</div><div>單</div>
                                     </div>
                                     ` : `<div style="width:21px; flex-shrink:0;"></div>`}
                                     <div style="display:flex; flex-direction:column; gap:4px; min-width: 0; justify-content:center;">
-                                        <div style="font-weight:600; font-size:0.98rem; color:#fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${o.name}</div>
+                                        <div style="font-weight:600; font-size:0.92rem; color:#fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${o.name}</div>
                                         <div style="display:flex; align-items:center; gap:3px;">
                                             ${marketBadge}
-                                            <span style="color:${o.side === 'buy' ? '#e5484d' : '#00b06b'}; font-size:0.92rem; font-weight:500;">${o.side === 'buy' ? '買進' : '賣出'}&nbsp;${o.type === 'market' ? '市價' : '限價'}</span>
+                                            <span style="color:${o.side === 'buy' ? '#e5484d' : '#00b06b'}; font-size:0.85rem; font-weight:500;">${o.side === 'buy' ? '買進' : '賣出'}&nbsp;${o.type === 'market' ? '市價' : '限價'}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div style="flex:0.95; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:right; align-self:flex-start; padding-top:2px;">
-                                    <div style="font-size:0.98rem; color:#fff; font-weight:600;">${formatNumber(o.shares, 0)}股</div>
-                                    <div style="font-size:0.98rem; color:#fff; font-weight:600;">${o.status === 'executed' ? formatNumber(execShares, 0) + '股' : '-'}</div>
+                                <div style="width:20%; flex-shrink:0; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:right; align-self:flex-start; padding-top:2px;">
+                                    <div style="font-size:0.92rem; color:#fff; font-weight:500;">${formatNumber(o.shares, 0)}股</div>
+                                    <div style="font-size:0.92rem; color:#fff; font-weight:500;">${o.status === 'executed' ? formatNumber(execShares, 0) + '股' : '-'}</div>
                                 </div>
-                                <div style="flex:1.25; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:right; align-self:flex-start; padding-top:2px;">
-                                    <div style="font-size:0.98rem; color:#fff; font-weight:600;">${formatNumber(o.price, decO)}</div>
-                                    <div style="font-size:0.98rem; color:#fff; font-weight:600;">${o.status === 'executed' ? formatNumber(execAvgPrice, decO) : '-'}</div>
+                                <div style="width:27%; flex-shrink:0; display:flex; flex-direction:column; gap:4px; justify-content:center; text-align:right; align-self:flex-start; padding-top:2px;">
+                                    <div style="font-size:0.92rem; color:#fff; font-weight:500;">${formatNumber(o.price, decO)}</div>
+                                    <div style="font-size:0.92rem; color:#fff; font-weight:500;">${o.status === 'executed' ? formatNumber(execAvgPrice, decO) : '-'}</div>
                                 </div>
-                                <div style="width:84px; flex-shrink:0; display:flex; align-items:flex-start; justify-content:space-between; padding-left:10px; padding-top:4px; box-sizing:border-box; align-self:flex-start;">
+                                <div style="width:74px; flex-shrink:0; display:flex; align-items:flex-start; justify-content:flex-start; gap:4px; padding-left:10px; padding-top:2px; box-sizing:border-box; align-self:flex-start;">
                                     <div style="display:flex; flex-direction:column; align-items:flex-start;">
-                                        <div style="font-size:0.98rem; color:#fff; font-weight:600; line-height:1.25;">${statusTop}</div>
-                                        <div style="font-size:0.98rem; color:#fff; font-weight:600; line-height:1.25;">${statusBottom}</div>
+                                        <div style="font-size:0.92rem; color:#fff; font-weight:600; line-height:1.3;">${statusTop}</div>
+                                        <div style="font-size:0.92rem; color:#fff; font-weight:600; line-height:1.3;">${statusBottom}</div>
                                     </div>
-                                    <div style="display:flex; align-items:center; justify-content:center; width:16px; flex-shrink:0; padding-top:6px;">
+                                    <div style="display:flex; align-items:center; justify-content:center; width:16px; flex-shrink:0; padding-top:10px;">
                                         ${chevronSvg}
                                     </div>
                                 </div>
                             </div>
                             ${isExpanded ? `
-                            <div style="background-color: #232833; border-radius: 10px; padding: 14px 20px 14px 21px; margin: 2px 0 10px 0; font-size: 0.98rem; display: flex; flex-direction: column; gap: 9px;">
+                            <div style="background-color: #232833; border-radius: 10px; padding: 14px 24px 14px 26px; margin: 2px 0 12px 0; font-size: 0.92rem; display: flex; flex-direction: column; gap: 12px;">
                                 ${detailRow('交易時段', '僅盤中時段')}
                                 ${detailRow('觸價價格', o.status === 'executed' ? formatNumber(o.price, decO) : '-')}
                                 ${detailRow('委託時間', orderTimeDisp)}
