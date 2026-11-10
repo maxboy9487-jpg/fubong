@@ -310,6 +310,7 @@ window.setOrderMatching = function (shouldMatch) {
     }
     showToast(msg, type);
     if (state.currentPage === 'portfolio') renderPage('portfolio', { keepScroll: true });
+    if (state.currentPage === 'more') renderPage('more', { keepScroll: true });
 };
 
 window.setPriceFluctuations = function (enabled) {
@@ -3186,17 +3187,41 @@ function renderMorePage() {
                 </h4>
                 <div style="display:flex; flex-direction:column; gap:12px;">
                     <div style="display:flex; gap:10px; align-items:center;">
-                        <span style="font-size:0.9rem; color:#888; white-space:nowrap; width:120px;">選擇股票:</span>
-                        <select id="more-change-stock-select" style="flex:1; background:#111; border:1px solid #444; color:white; padding:8px; border-radius:8px; font-size:0.95rem; font-weight:600; outline:none; height:38px;">
-                            ${state.marketData.filter(s => !s.isIndex).map(s => `<option value="${s.symbol}">${s.name} (${s.symbol}) - 目前: ${s.price}</option>`).join('')}
-                        </select>
+                        <span style="font-size:0.9rem; color:#888; white-space:nowrap; width:120px;">搜尋股票:</span>
+                        <div style="flex:1; position:relative;">
+                            <input type="text" id="more-change-stock-search" autocomplete="off" placeholder="輸入股票代號或名稱" oninput="window.moreStockSearch(this.value)" onfocus="window.moreStockSearch(this.value)" onblur="setTimeout(() => { const b = document.getElementById('more-change-stock-results'); if (b) b.style.display = 'none'; }, 200)" style="width:100%; box-sizing:border-box; background:#111; border:1px solid #444; color:white; padding:8px; border-radius:8px; font-size:0.95rem; font-weight:600; outline:none; height:38px;">
+                            <input type="hidden" id="more-change-stock-select" value="">
+                            <div id="more-change-stock-results" style="display:none; position:absolute; top:42px; left:0; right:0; max-height:240px; overflow-y:auto; background:#1e1e1e; border:1px solid #444; border-radius:8px; z-index:50; box-shadow:0 4px 12px rgba(0,0,0,0.5);"></div>
+                        </div>
                     </div>
+                    <div id="more-change-stock-current" style="font-size:0.85rem; color:#888; margin-left:130px; display:none;"></div>
                     <div style="display:flex; gap:10px; align-items:center;">
                         <span style="font-size:0.9rem; color:#888; white-space:nowrap; width:120px;">改變目前的價格為：</span>
                         <input type="number" id="more-change-stock-price" step="0.01" style="flex:1; background:#111; border:1px solid #444; color:white; padding:8px; border-radius:8px; font-size:0.95rem; outline:none; height:38px;" placeholder="輸入新價格">
                     </div>
                     <button class="btn btn-blue" style="margin-top:4px; height:44px; font-weight:bold; border-radius:8px;" onclick="window.moreChangeStockPrice()">改變</button>
                 </div>
+            </div>
+
+            <!-- 成交設定 Section -->
+            <div class="card" style="margin-bottom: 24px; padding: 16px; background-color: #1a191d; border: 1px solid #333; border-radius: 12px;">
+                <h4 style="color:#4db6ac; margin-bottom:16px; font-size:1.1rem; display:flex; align-items:center; gap:8px;">
+                    <i class="fa-solid fa-circle-check"></i> 成交設定
+                </h4>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; background:#111; padding:6px; border-radius:8px; border:1px solid #333;">
+                    ${[
+                        { val: true, js: 'true', label: '要成交' },
+                        { val: 'submitted', js: "'submitted'", label: '不成交(委託成功)' },
+                        { val: false, js: 'false', label: '不成交(委託傳送中)' },
+                        { val: 'failed', js: "'failed'", label: '委託失敗' }
+                    ].map(opt => {
+                        const active = opt.val === true
+                            ? (state.shouldMatchOrders === true || state.shouldMatchOrders === undefined)
+                            : state.shouldMatchOrders === opt.val;
+                        return `<button class="btn" style="padding:10px 6px; font-size:0.85rem; border:none; cursor:pointer; color:${active ? 'white' : '#888'}; background:${active ? '#4db6ac' : 'transparent'}; border-radius:6px; font-weight:bold; transition:all 0.2s;" onclick="window.setOrderMatching(${opt.js})">${opt.label}</button>`;
+                    }).join('')}
+                </div>
+                <p style="font-size:0.8rem; color:#888; margin-top:12px; margin-bottom:0; line-height:1.4;">設定模擬下單後的撮合狀態：要成交、不成交(委託成功)、不成交(委託傳送中)、或委託失敗。</p>
             </div>
 
             <!-- 即時股價跳動設定 Section -->
@@ -3240,8 +3265,62 @@ function renderMorePage() {
     `;
 }
 
+window.moreStockSearch = function (keyword) {
+    const box = document.getElementById('more-change-stock-results');
+    if (!box) return;
+    const hidden = document.getElementById('more-change-stock-select');
+    const kw = (keyword || '').trim().toLowerCase();
+
+    // Typing again invalidates the previous selection
+    if (hidden && hidden.dataset.label !== keyword) {
+        hidden.value = '';
+        const cur = document.getElementById('more-change-stock-current');
+        if (cur) cur.style.display = 'none';
+    }
+
+    if (!kw) { box.style.display = 'none'; box.innerHTML = ''; return; }
+
+    const matches = state.marketData
+        .filter(s => !s.isIndex && (String(s.symbol).toLowerCase().includes(kw) || String(s.name).toLowerCase().includes(kw)))
+        .sort((a, b) => {
+            const aStarts = String(a.symbol).toLowerCase().startsWith(kw) || String(a.name).toLowerCase().startsWith(kw);
+            const bStarts = String(b.symbol).toLowerCase().startsWith(kw) || String(b.name).toLowerCase().startsWith(kw);
+            return (bStarts ? 1 : 0) - (aStarts ? 1 : 0);
+        })
+        .slice(0, 30);
+
+    box.innerHTML = matches.length === 0
+        ? '<div style="padding:10px 12px; color:#888; font-size:0.9rem;">找不到符合的股票</div>'
+        : matches.map(s => `
+            <div onmousedown="window.moreStockSelect('${String(s.symbol).replace(/'/g, "\\'")}')" style="padding:10px 12px; cursor:pointer; border-bottom:1px solid #2a2a2a; display:flex; justify-content:space-between; font-size:0.9rem;" onmouseover="this.style.background='#2a2a2a'" onmouseout="this.style.background='transparent'">
+                <span style="color:white; font-weight:600;">${s.name} <span style="color:#888; font-weight:400;">(${s.symbol})</span></span>
+                <span style="color:#ffb74d; font-family:var(--font-mono);">${s.price}</span>
+            </div>`).join('');
+    box.style.display = 'block';
+};
+
+window.moreStockSelect = function (symbol) {
+    const stock = state.marketData.find(s => s.symbol === symbol);
+    if (!stock) return;
+    const label = `${stock.name} (${stock.symbol})`;
+    const input = document.getElementById('more-change-stock-search');
+    const hidden = document.getElementById('more-change-stock-select');
+    const box = document.getElementById('more-change-stock-results');
+    const cur = document.getElementById('more-change-stock-current');
+    if (input) input.value = label;
+    if (hidden) { hidden.value = stock.symbol; hidden.dataset.label = label; }
+    if (box) box.style.display = 'none';
+    if (cur) { cur.textContent = `目前價格: ${stock.price}`; cur.style.display = 'block'; }
+    const priceInput = document.getElementById('more-change-stock-price');
+    if (priceInput) priceInput.focus();
+};
+
 window.moreChangeStockPrice = function () {
     const symbol = document.getElementById('more-change-stock-select').value;
+    if (!symbol) {
+        showToast('請先輸入並選擇股票');
+        return;
+    }
     const priceVal = document.getElementById('more-change-stock-price').value;
     if (!priceVal) {
         showToast('請輸入新價格');
